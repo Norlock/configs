@@ -94,8 +94,15 @@ nmap <Leader>g :GitFiles<Cr>
 nmap <Leader>b :Buffers<Cr>
 nmap <Leader>l :Locate 
 nmap <Leader>a :Rg<Cr>
-nmap <silent> <Leader>b :Buffers<Cr>
+"nmap <silent> <Leader>b :Buffers<Cr>
 nnoremap <Leader>w :w !sudo tee %<Cr>
+
+nnoremap <Leader>g <cmd>lua require'telescope.builtin'.git_files{}<CR>
+nnoremap <Leader>f <cmd>lua require'telescope.builtin'.find_files{}<CR>
+nnoremap <Leader>a <cmd>lua require'telescope.builtin'.live_grep{}<CR>
+nnoremap <silent> gr <cmd>lua require'telescope.builtin'.lsp_references{}<CR>
+"nnoremap <Leader>tb <cmd>lua require'telescope.builtin'.builtin{}<CR>
+nnoremap <Leader>b <cmd>lua require'telescope.builtin'.buffers{}<CR>
 
 nmap [[ :bp<Cr> 
 nmap ]] :bn<Cr> 
@@ -126,6 +133,7 @@ let g:fzf_action = {
 let g:fzf_buffers_jump = 1
 
 " Use completion-nvim in every buffer
+autocmd BufEnter * lua require'completion'.on_attach()
 lua require'lspconfig'.tsserver.setup{}
 lua require'lspconfig'.html.setup{}
 lua require'lspconfig'.cssls.setup{}
@@ -182,13 +190,6 @@ require('telescope').setup {
 EOF
 
 lua require'nvim-web-devicons'.setup()
-
-nnoremap <Leader>tf <cmd>lua require'telescope.builtin'.git_files{}<CR>
-nnoremap <Leader>tf <cmd>lua require'telescope.builtin'.find_files{}<CR>
-nnoremap <Leader>tg <cmd>lua require'telescope.builtin'.live_grep{}<CR>
-nnoremap <silent> gr <cmd>lua require'telescope.builtin'.lsp_references{}<CR>
-"nnoremap <Leader>tb <cmd>lua require'telescope.builtin'.builtin{}<CR>
-nnoremap <Leader>tb <cmd>lua require'telescope.builtin'.buffers{}<CR>
 
 " Expand
 imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<Cr>'

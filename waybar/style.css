@@ -1,0 +1,106 @@
+* {
+    border: none;
+    border-radius: 2px;
+    font-family: Ubuntu Mono derivative Powerline, Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(15, 20, 25, 1);
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+#workspaces button {
+    padding: 6px 6px;
+    background: transparent;
+    color: #e6e1cf;
+}
+
+#workspaces button.focused {
+    background: #323232;
+}
+
+#workspaces button.urgent {
+    background-color: #eb4d4b;
+}
+
+#mode {
+    background: #323232;
+}
+
+#clock, #battery, #cpu, #memory, #temperature, #network, #pulseaudio, #custom-media, #tray, #mode, #idle_inhibitor {
+    padding: 0 8px;
+    margin: 0 2px;
+}
+
+#clock {
+    background-color: #36a3d9;
+    color: #ffffff;
+}
+
+#battery {
+    background-color: #eafe84;
+    color: #000000;
+}
+
+#battery.charging {
+    color: #ffffff;
+    background-color: #26A65B;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}
+
+#battery.critical:not(.charging) {
+    background: #f53c3c;
+    color: #ffffff;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#network {
+    background: #eafe84;
+    color: #000000;
+}
+
+#network.disconnected {
+    background: #f53c3c;
+}
+
+#pulseaudio {
+    background: #eafe84;
+    color: #000000;
+}
+
+#pulseaudio.muted {
+    background: #eafe84;
+    color: #000000;
+}
+
+#custom-media {
+    background: #eafe84;
+    color: #000000;
+}
+
+.custom-spotify {
+    background: #eafe84;
+    color: #000000;
+}
+
+.custom-vlc {
+    background: #eafe84;
+    color: #000000;
+}
+
+#tray {
+    background-color: #eafe84;
+    color: #000000;
+}

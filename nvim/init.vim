@@ -89,16 +89,16 @@ inoremap <F4> <Esc>mqggVG=`qzza
 " Navigation
 "nmap <Tab> :tabnext<Cr>
 "nmap <S-Tab> :tabprevious<Cr>
-nmap <Leader>f :FZF<Cr>
-nmap <Leader>g :GitFiles<Cr>
-nmap <Leader>b :Buffers<Cr>
-nmap <Leader>l :Locate 
-nmap <Leader>a :Rg<Cr>
+"nmap <Leader>f :FZF<Cr>
+"nmap <Leader>g :GitFiles<Cr>
+"nmap <Leader>b :Buffers<Cr>
+"nmap <Leader>l :Locate 
+"nmap <Leader>a :Rg<Cr>
 "nmap <silent> <Leader>b :Buffers<Cr>
 nnoremap <Leader>w :w !sudo tee %<Cr>
 
-nnoremap <Leader>g <cmd>lua require'telescope.builtin'.git_files{}<CR>
 nnoremap <Leader>f <cmd>lua require'telescope.builtin'.find_files{}<CR>
+nnoremap <Leader>g <cmd>lua require'telescope.builtin'.git_files{}<CR>
 nnoremap <Leader>a <cmd>lua require'telescope.builtin'.live_grep{}<CR>
 nnoremap <silent> gr <cmd>lua require'telescope.builtin'.lsp_references{}<CR>
 "nnoremap <Leader>tb <cmd>lua require'telescope.builtin'.builtin{}<CR>
@@ -200,10 +200,10 @@ imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l
 smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
 
 " Jump forward or backward
-imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+"imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+"smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+"imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+"smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
 " Set completeopt to have a better completion experience
 set completeopt=menuone,noinsert

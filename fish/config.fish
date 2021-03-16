@@ -5,11 +5,14 @@ set -g fish_prompt_pwd_dir_length 0
 
 set -gx EDITOR nvim
 set -gx BROWSER firefox
-
+set -gx DENO_INSTALL /home/norlock/.deno
 
 set -gx GEM_HOME ~/.ruby 
+set -x PATH $PATH ~/.cargo/bin
+set -x PATH $PATH ~/.local/bin
 set -x PATH $PATH /usr/sbin
 set -x PATH $PATH ~/.nodemodules/bin
+set -x PATH $PATH $DENO_INSTALL/bin
 
 # Setting fd as the default source for fzf
 set -gx FZF_DEFAULT_COMMAND "fd --type f"
@@ -21,15 +24,12 @@ alias fishConfig="nvim ~/.config/fish/config.fish"
 alias fishReload="source ~/.config/fish/config.fish"
 
 # Because I'm lazy
-alias dr="vendor/bin/drush"
-alias gw="./gradlew"
-alias n="nvim"
 alias r="ranger"
 alias n="nvim"
-alias i3Config="nvim ~/.config/i3/config"
 alias nvimConfig="nvim ~/.config/nvim/init.vim"
 alias swayConfig="nvim ~/.config/sway/config"
 alias alacrittyConfig="nvim ~/.config/alacritty/alacritty.yml"
+alias kittyConfig="nvim ~/.config/kitty/kitty.conf"
 alias ...="cd ../.."
 alias ....="cd ../../.."
 

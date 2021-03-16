@@ -1,8 +1,6 @@
 " Use ZZ (quit and save) us ZQ (quit no save)
 call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdcommenter'
 Plug 'tpope/vim-fugitive'
 Plug 'ap/vim-css-color'
@@ -20,8 +18,12 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'kyazdani42/nvim-web-devicons'
+
+" Vim rooter
+Plug 'airblade/vim-rooter'
 
 " Themes
 Plug 'itchyny/lightline.vim'
@@ -53,12 +55,15 @@ set autoindent smartindent    " turns it on
 set number relativenumber " Number on the line relative number above below.
 set tabstop=4 softtabstop=4 expandtab shiftwidth=4 
 set noshowmode		" Hide extra line to show the curent mode
+set noswapfile
 set cursorline    " Highlight current line
 set scrolloff=3 " Always leave lines down
 set tw=120 " Set textwidth 
 set pastetoggle=<F2>
 set fileencoding=utf-8
 set encoding=utf-8
+set wildmode=longest:full
+set hidden " Allow switching buffers even if not written
 
 " Buffers
 nmap Zc <Esc>:bw<Cr>
@@ -76,8 +81,12 @@ nnoremap <silent> <Esc> :nohlsearch<Cr>
 " Remap escape
 inoremap jj <Esc> 
 
-nmap <silent> J :move +1<Cr> 
-nmap <silent> K :move -2<Cr> 
+" Quickfix
+map <C-j> :cn<CR>
+map <C-k> :cp<CR>
+
+nmap <silent> _ :move -2<Cr> 
+nmap <silent> + :move +1<Cr> 
 
 imap <C-s> <Esc>:w<Cr>a
 nmap <C-s> :w<Cr>
@@ -86,23 +95,21 @@ nmap <C-s> :w<Cr>
 noremap <F4> mqggVG=`qzz
 inoremap <F4> <Esc>mqggVG=`qzza
 
-" Navigation
-"nmap <Tab> :tabnext<Cr>
-"nmap <S-Tab> :tabprevious<Cr>
-"nmap <Leader>f :FZF<Cr>
-"nmap <Leader>g :GitFiles<Cr>
-"nmap <Leader>b :Buffers<Cr>
-"nmap <Leader>l :Locate 
-"nmap <Leader>a :Rg<Cr>
-"nmap <silent> <Leader>b :Buffers<Cr>
-nnoremap <Leader>w :w !sudo tee %<Cr>
+nnoremap Y y$
 
+" Navigation
 nnoremap <Leader>f <cmd>lua require'telescope.builtin'.find_files{}<CR>
 nnoremap <Leader>g <cmd>lua require'telescope.builtin'.git_files{}<CR>
+nnoremap <Leader>s <cmd>lua require'telescope.builtin'.git_status{}<CR>
 nnoremap <Leader>a <cmd>lua require'telescope.builtin'.live_grep{}<CR>
-nnoremap <silent> gr <cmd>lua require'telescope.builtin'.lsp_references{}<CR>
-"nnoremap <Leader>tb <cmd>lua require'telescope.builtin'.builtin{}<CR>
+nnoremap <Leader>l <cmd>lua require'telescope.builtin'.builtin{}<CR>
 nnoremap <Leader>b <cmd>lua require'telescope.builtin'.buffers{}<CR>
+
+nnoremap <silent> gr <cmd>lua require'telescope.builtin'.lsp_references{}<CR>
+nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> K  <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <Leader>q <cmd>lua vim.lsp.buf.code_action()<CR>
 
 nmap [[ :bp<Cr> 
 nmap ]] :bn<Cr> 
@@ -114,82 +121,45 @@ nmap <silent> <A-Up> :wincmd k<CR>
 nmap <silent> <A-Down> :wincmd j<CR>
 nmap <silent> <A-Left> :wincmd h<CR>
 nmap <silent> <A-Right> :wincmd l<CR>
-nmap <silent> <A-k> :wincmd k<CR>
-nmap <silent> <A-j> :wincmd j<CR>
-nmap <silent> <A-h> :wincmd h<CR>
-nmap <silent> <A-l> :wincmd l<CR>
+
+" To use `ALT+{h,j,k,l}` to navigate windows from any mode:
+tnoremap <A-h> <C-\><C-N><C-w>h
+tnoremap <A-j> <C-\><C-N><C-w>j
+tnoremap <A-k> <C-\><C-N><C-w>k
+tnoremap <A-l> <C-\><C-N><C-w>l
+inoremap <A-h> <C-\><C-N><C-w>h
+inoremap <A-j> <C-\><C-N><C-w>j
+inoremap <A-k> <C-\><C-N><C-w>k
+inoremap <A-l> <C-\><C-N><C-w>l
+nnoremap <A-h> <C-w>h
+nnoremap <A-j> <C-w>j
+nnoremap <A-k> <C-w>k
+nnoremap <A-l> <C-w>l
+
+tmap <silent> <A-Up> <A-k>
+tmap <silent> <A-Down> <A-j>
+tmap <silent> <A-Left> <A-h>
+tmap <silent> <A-Right> <A-l>
 
 set splitright " Splits pane to the right
 set splitbelow " Splits pane below
 
-set hidden " Allow switching buffers even if not written
+lua require("custom_lua")
 
-let g:fzf_action = {
-            \ 'ctrl-t': 'tab split',
-            \ 'ctrl-h': 'split',
-            \ 'ctrl-v': 'vsplit' }
+command LSPInstall :vsplit term://sudo lua ~/.config/nvim/lua/install_lsp.lua<CR>i
 
-" [Buffers] Jump to the existing window if possible
-let g:fzf_buffers_jump = 1
+autocmd BufWinEnter,WinEnter term://* startinsert
+nmap <silent> <leader>ts :vsplit<CR>:terminal<CR>i
+nmap <silent> <leader>tt :tabe<CR>:terminal<CR>i
 
-" Use completion-nvim in every buffer
-autocmd BufEnter * lua require'completion'.on_attach()
-lua require'lspconfig'.tsserver.setup{}
-lua require'lspconfig'.html.setup{}
-lua require'lspconfig'.cssls.setup{}
-lua require'lspconfig'.jsonls.setup{}
-lua require'lspconfig'.vimls.setup{}
+tmap <leader><esc> <c-\><c-n>
+tmap <leader>e i<esc>:bw!<CR>
+nmap <leader>e i<esc>:bw<CR>
 
-" TODO completion buffers fixen
-nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> <Leader>q <cmd>lua vim.lsp.buf.code_action()<CR>
-
-lua <<EOF
-require'nvim-treesitter.configs'.setup {
-    -- Modules and its options go here
-    highlight = { enable = true },
-    incremental_selection = { enable = true },
-    refactor = {
-        highlight_definitions = { enable = true },
-        smart_rename = { enable = true },
-        navigation = { enable = true },
-    },
-    textobjects = { enable = true },
-}
-EOF
-
-lua <<EOF
-completion_chain_complete_list = {
-  { complete_items = { 'lsp' } },
-  { complete_items = { 'buffers' } },
-  { mode = { '<c-p>' } },
-  { mode = { '<c-n>' } }
-}
-EOF
-
-" Disable normal mode on exit
-lua <<EOF
-local actions = require('telescope.actions')
-
-require('telescope').setup {
-  defaults = {
-    mappings = {
-      i = {
-        -- Disable the default <c-x> mapping
-        ["<c-x>"] = false,
-
-        -- Create a new <c-s> mapping
-        ["<c-s>"] = actions.goto_file_selection_split,
-        ["<Esc>"] = actions.close
-      },
-    },
-  }
-}
-EOF
-
-lua require'nvim-web-devicons'.setup()
+tmap <silent> <A-Up> <esc>:wincmd k<CR>
+tmap <silent> <A-Down> <esc>:wincmd j<CR>
+tmap <silent> <A-Left> <esc>:wincmd h<CR>
+tmap <silent> <A-Right> <esc>:wincmd l<CR>
 
 " Expand
 imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<Cr>'
@@ -204,9 +174,6 @@ smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l
 "smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
 "imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 "smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-
-" Set completeopt to have a better completion experience
-set completeopt=menuone,noinsert
 
 " map <c-p> to manually trigger completion
 inoremap <silent><expr> <c-space> completion#trigger_completion()

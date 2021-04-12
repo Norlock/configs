@@ -7,20 +7,20 @@ Plug 'ap/vim-css-color'
 Plug 'justinmk/vim-dirvish'
 Plug 'justinmk/vim-sneak'
 Plug 'godlygeek/tabular' " Surrounds around tabs 
-Plug 'ludovicchabant/vim-gutentags'
-
-" Snippets are separated from the engine. Add this if you want them:
-Plug 'honza/vim-snippets'
 
 " Nvim 5.0
-Plug 'nvim-lua/completion-nvim'
-Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-fzy-native.nvim'
-Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 Plug 'kyazdani42/nvim-web-devicons'
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ'
+Plug 'prabirshrestha/vim-lsp'
+
+" Use release branch (recommend)
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " Vim rooter
 Plug 'airblade/vim-rooter'
@@ -65,6 +65,19 @@ set encoding=utf-8
 set wildmode=longest:full
 set hidden " Allow switching buffers even if not written
 
+set nobackup
+set nowritebackup
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
 " Buffers
 nmap Zc <Esc>:bw<Cr>
 
@@ -97,6 +110,58 @@ inoremap <F4> <Esc>mqggVG=`qzza
 
 nnoremap Y y$
 
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <c-space> coc#refresh()
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>o  <Plug>(coc-format-selected)
+nmap <leader>o  <Plug>(coc-format-selected)
+
+nmap <leader>q <Plug>(coc-codeaction)
+
 " Navigation
 nnoremap <Leader>f <cmd>lua require'telescope.builtin'.find_files{}<CR>
 nnoremap <Leader>g <cmd>lua require'telescope.builtin'.git_files{}<CR>
@@ -105,16 +170,8 @@ nnoremap <Leader>a <cmd>lua require'telescope.builtin'.live_grep{}<CR>
 nnoremap <Leader>l <cmd>lua require'telescope.builtin'.builtin{}<CR>
 nnoremap <Leader>b <cmd>lua require'telescope.builtin'.buffers{}<CR>
 
-nnoremap <silent> gr <cmd>lua require'telescope.builtin'.lsp_references{}<CR>
-nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> K  <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> <Leader>q <cmd>lua vim.lsp.buf.code_action()<CR>
-
 nmap [[ :bp<Cr> 
 nmap ]] :bn<Cr> 
-
-let g:gutentags_file_list_command = 'rg --files'
 
 " Switch between panes with alt
 nmap <silent> <A-Up> :wincmd k<CR>
@@ -144,9 +201,7 @@ tmap <silent> <A-Right> <A-l>
 set splitright " Splits pane to the right
 set splitbelow " Splits pane below
 
-lua require("custom_lua")
-
-command LSPInstall :vsplit term://sudo lua ~/.config/nvim/lua/install_lsp.lua<CR>i
+lua require("custom_telescope")
 
 autocmd BufWinEnter,WinEnter term://* startinsert
 nmap <silent> <leader>ts :vsplit<CR>:terminal<CR>i
@@ -170,10 +225,10 @@ imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l
 smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
 
 " Jump forward or backward
-"imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-"smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-"imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-"smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
 " map <c-p> to manually trigger completion
 inoremap <silent><expr> <c-space> completion#trigger_completion()
@@ -185,7 +240,7 @@ let g:completion_enable_snippet = 'vim-vsnip'
 let g:sneak#label = 1
 
 " Markdown
-let g:previm_open_cmd = 'firefox'
+let g:previm_open_cmd = 'brave-browser'
 
 " Easy nvim config
 nmap <Leader>n :tabedit ~/.config/nvim/init.vim<Cr>

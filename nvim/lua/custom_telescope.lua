@@ -1,15 +1,10 @@
--- Use completion-nvim in every buffer
-local lspconfig = require('lspconfig')
 local actions = require('telescope.actions')
 
-lspconfig.tsserver.setup{}
-lspconfig.html.setup{}
-lspconfig.cssls.setup{}
-lspconfig.jsonls.setup{}
-lspconfig.vimls.setup{}
-lspconfig.rust_analyzer.setup{}
-
-require('nvim-web-devicons').setup()
+require'nvim-web-devicons'.setup {
+ -- globally enable default icons (default to false)
+ -- will get overriden by `get_icons` option
+ default = true;
+}
 
 require('telescope').setup {
   defaults = {
@@ -19,7 +14,6 @@ require('telescope').setup {
         ["<C-x>"] = false,
 
         -- Create a new <c-s> mapping
-        ["<C-s>"] = actions.select_horizontal,
         ["<Esc>"] = actions.close
       },
     },
@@ -36,11 +30,4 @@ require('nvim-treesitter.configs').setup {
         navigation = { enable = true },
     },
     textobjects = { enable = true },
-}
-
-completion_chain_complete_list = {
-  { complete_items = { 'lsp' } },
-  { complete_items = { 'buffers' } },
-  { mode = { '<c-p>' } },
-  { mode = { '<c-n>' } }
 }

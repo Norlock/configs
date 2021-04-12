@@ -17,15 +17,15 @@ set $right l
 # Your preferred terminal emulator
 set $term alacritty
 # Your preferred application launcher
-set $menu bemenu-run --fn "Fira Mono for Powerline 16" -l 8
+set $menu bemenu-run -m 1 --fn "Fira Mono for Powerline 16" -l 8
 
 ### Output configuration
 #
-output DP-1 resolution 2560x1440@144.000000Hz pos 0,0
-output HDMI-A-1 resolution 2560x1440 pos 2560,0
+output DP-3 resolution 2560x1440@144.000000Hz pos 0,0
+output HDMI-A-1 resolution 2560x1440 pos 2560,350
 
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output DP-1 bg ~/Projects/configs/images/wallpapers/ban-cover.jpg fit #000000
+output DP-3 bg ~/Projects/configs/images/wallpapers/ban-cover.jpg fit #000000
 output HDMI-A-1 bg ~/Projects/configs/images/wallpapers/ns06m.jpg fit #000000
 #
 # Example configuration:
@@ -75,7 +75,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+e exit
 
 # browser
-bindsym $mod+p exec firefox-developer-edition
+bindsym $mod+p exec brave-browser
 bindsym $mod+c exec telegram-desktop
 
 # Lock screen

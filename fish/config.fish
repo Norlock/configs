@@ -1,10 +1,9 @@
 set -gx npm_config_prefix ~/.nodemodules
 set -gx MOZ_ENABLE_WAYLAND 1
-set -gx QT_QPA_PLATFORM wayland
 set -g fish_prompt_pwd_dir_length 0
 
 set -gx EDITOR nvim
-set -gx BROWSER firefox
+set -gx BROWSER brave-browser
 set -gx DENO_INSTALL /home/norlock/.deno
 
 set -gx GEM_HOME ~/.ruby 

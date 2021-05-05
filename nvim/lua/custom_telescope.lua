@@ -3,7 +3,6 @@ local actions = require('telescope.actions')
 require'nvim-web-devicons'.setup {
  -- globally enable default icons (default to false)
  -- will get overriden by `get_icons` option
- default = true;
 }
 
 require('telescope').setup {

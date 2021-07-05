@@ -7,5 +7,9 @@
     }
   },
   // If you use neovim you can enable codelenses with this
-  "codeLens.enable": true
+  "codeLens.enable": true,
+  "coc.preferences.formatOnSaveFiletypes": ["elm"],
+  "rust-analyzer.procMacro.enable": false,
+  "rust-analyzer.updates.channel": "nightly",
+  "rust-analyzer.cargo.loadOutDirsFromCheck": true
 }

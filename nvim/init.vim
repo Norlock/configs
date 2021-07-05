@@ -17,7 +17,6 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend upda
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/vim-vsnip-integ'
-Plug 'prabirshrestha/vim-lsp'
 
 " Use release branch (recommend)
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -68,6 +67,7 @@ set fileencoding=utf-8
 set encoding=utf-8
 set wildmode=longest:full
 set hidden " Allow switching buffers even if not written
+set mouse=a
 
 set nobackup
 set nowritebackup

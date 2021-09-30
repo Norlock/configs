@@ -35,6 +35,9 @@ Plug 'ayu-theme/ayu-vim'
 " Markdown
 Plug 'kannokanno/previm'
 
+" Open GL
+Plug 'tikhomirov/vim-glsl'
+
 " Initialize plugin system
 call plug#end()
 
@@ -140,6 +143,8 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+
+nmap <silent> <Leader>v :vsplit<Cr>
 
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -249,3 +254,6 @@ let g:previm_open_cmd = 'brave-browser'
 
 " Easy nvim config
 nmap <Leader>n :tabedit ~/.config/nvim/init.vim<Cr>
+
+" GLSL
+autocmd! BufNewFile,BufRead *.vs,*.fs set ft=glsl

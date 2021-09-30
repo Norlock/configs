@@ -131,6 +131,8 @@ for_window [class="spotify"] focus
 for_window [class="telegram-desktop"] focus
 for_window [class="firefox"] focus
 
+for_window [class="space-fighters"] floating enable
+
 # switch to workspace
 bindsym $mod+1 workspace $ws1
 bindsym $mod+2 workspace $ws2

@@ -1,20 +1,18 @@
 set -gx npm_config_prefix ~/.nodemodules
 set -g fish_prompt_pwd_dir_length 0
 
-#set -gx MOZ_ENABLE_WAYLAND 1*/
+set -gx MOZ_ENABLE_WAYLAND
 #set -gx QT_QPA_PLATFORM wayland*/
 
 
 set -gx EDITOR nvim
-set -gx BROWSER brave-browser
-set -gx DENO_INSTALL /home/norlock/.deno
+set -gx BROWSER firefox-developer-edition
 
 set -gx GEM_HOME ~/.ruby 
 set -x PATH $PATH ~/.cargo/bin
 set -x PATH $PATH ~/.local/bin
 set -x PATH $PATH /usr/sbin
 set -x PATH $PATH ~/.nodemodules/bin
-set -x PATH $PATH $DENO_INSTALL/bin
 
 # Setting fd as the default source for fzf
 set -gx FZF_DEFAULT_COMMAND "fd --type f"

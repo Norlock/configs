@@ -75,7 +75,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+e exit
 
 # browser
-bindsym $mod+p exec brave-browser
+bindsym $mod+p exec brave
 bindsym $mod+c exec telegram-desktop
 
 # Lock screen
@@ -118,18 +118,16 @@ set $ws3 3
 set $ws4 4
 set $ws5 5
 set $ws6 6
-set $ws7 7: Spotify
-set $ws8 8: Browser
+set $ws7 7
+set $ws8 8
 set $ws9 9: Telegram
 set $ws10 0
 
 # Assign Workspaces:
 assign [class="spotify"] $ws7
-assign [class="firefox"] $ws8
 assign [class="telegram-desktop"] $ws9
 for_window [class="spotify"] focus
 for_window [class="telegram-desktop"] focus
-for_window [class="firefox"] focus
 
 for_window [class="space-fighters"] floating enable
 

@@ -2,7 +2,7 @@ set -gx npm_config_prefix ~/.nodemodules
 set -g fish_prompt_pwd_dir_length 0
 
 set -gx MOZ_ENABLE_WAYLAND
-#set -gx QT_QPA_PLATFORM wayland*/
+set -gx QT_QPA_PLATFORM wayland
 
 
 set -gx EDITOR nvim

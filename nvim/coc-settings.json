@@ -11,5 +11,5 @@
   "rust-analyzer.procMacro.enable": false,
   "rust-analyzer.updates.channel": "nightly",
   "rust-analyzer.cargo.loadOutDirsFromCheck": true,
-  "coc.preferences.formatOnSaveFiletypes": ["scss", "markdown", "html", "elm", "typescript", "rust"]
+  "coc.preferences.formatOnSaveFiletypes": ["scss", "markdown", "html", "elm", "typescript", "rust", "javascript", "vue"]
 }

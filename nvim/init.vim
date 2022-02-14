@@ -182,6 +182,8 @@ nnoremap <Leader>b <cmd>lua require'telescope.builtin'.buffers{}<CR>
 
 nmap [[ :bp<Cr> 
 nmap ]] :bn<Cr> 
+nmap <Leader>j ddp
+nmap <Leader>k ddkP
 
 " Switch between panes with alt
 nmap <silent> <A-Up> :wincmd k<CR>
@@ -225,6 +227,11 @@ tmap <silent> <A-Up> <esc>:wincmd k<CR>
 tmap <silent> <A-Down> <esc>:wincmd j<CR>
 tmap <silent> <A-Left> <esc>:wincmd h<CR>
 tmap <silent> <A-Right> <esc>:wincmd l<CR>
+
+nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
 
 " Expand
 imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<Cr>'

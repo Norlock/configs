@@ -1,12 +1,13 @@
+# Keyring
 set -gx npm_config_prefix ~/.nodemodules
 set -g fish_prompt_pwd_dir_length 0
 
 set -gx MOZ_ENABLE_WAYLAND
 set -gx QT_QPA_PLATFORM wayland
-set -gx _JAVA_AWT_WM_NONREPARENTING 1
 
 set -gx EDITOR nvim
 set -gx BROWSER firefox-developer-edition
+#set -gx XDG_RUNTIME_DIR ~/.config
 
 set -gx GEM_HOME ~/.ruby 
 set -x PATH $PATH ~/.cargo/bin

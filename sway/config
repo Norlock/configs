@@ -26,7 +26,7 @@ output HDMI-A-1 resolution 2560x1440 pos 2560,350
 
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
 output DP-3 bg ~/Projects/configs/images/wallpapers/ban-cover.jpg fit #000000
-output HDMI-A-1 bg ~/Projects/configs/images/wallpapers/ns06m.jpg fit #000000
+output HDMI-A-1 bg ~/Projects/configs/images/wallpapers/disharmonium.jpg fit #000000
 #
 # Example configuration:
 #

@@ -5,7 +5,7 @@ require'nvim-web-devicons'.setup {
  -- will get overriden by `get_icons` option
 }
 
-require('telescope').setup {
+require'telescope'.setup {
   defaults = {
     mappings = {
       i = {
@@ -19,8 +19,7 @@ require('telescope').setup {
   }
 }
 
-require('nvim-treesitter.configs').setup {
-    -- Modules and its options go here
+require'nvim-treesitter.configs'.setup {
     highlight = { enable = true },
     incremental_selection = { enable = true },
     refactor = {

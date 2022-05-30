@@ -35,9 +35,6 @@ Plug 'ayu-theme/ayu-vim'
 " Markdown
 Plug 'kannokanno/previm'
 
-" Open GL
-Plug 'tikhomirov/vim-glsl'
-
 " Initialize plugin system
 call plug#end()
 
@@ -94,12 +91,13 @@ vmap <Leader>p "+
 
 "---- Search ----
 set smartcase
+set ignorecase
 
 " Clean search highlighting
 nnoremap <silent> <Esc> :nohlsearch<Cr>
 
 " Remap escape
-inoremap jj <Esc> 
+inoremap js <Esc>
 
 " Quickfix
 map <C-j> :cn<CR>
@@ -135,7 +133,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-" GoTo code navigation.
+" Code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
@@ -147,29 +145,29 @@ nmap <silent> <Leader>v :vsplit<Cr>
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . " " . expand('<cword>')
-  endif
+    if (index(['vim','help'], &filetype) >= 0)
+        execute 'h '.expand('<cword>')
+    elseif (coc#rpc#ready())
+        call CocActionAsync('doHover')
+    else
+        execute '!' . &keywordprg . " " . expand('<cword>')
+    endif
 endfunction
 
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " set filetypes as typescriptreact
-autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact 
+
+" WLSL
+autocmd! BufNewFile,BufRead *.wgsl set filetype=wgsl
+
 let g:typescript_indent_disable = 1
 
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
-
-" Formatting selected code.
-xmap <leader>o  <Plug>(coc-format-selected)
-nmap <leader>o  <Plug>(coc-format-selected)
-
+" Code action
 nmap <leader>q <Plug>(coc-codeaction)
 
 " Navigation
@@ -179,11 +177,6 @@ nnoremap <Leader>s <cmd>lua require'telescope.builtin'.git_status{}<CR>
 nnoremap <Leader>a <cmd>lua require'telescope.builtin'.live_grep{}<CR>
 nnoremap <Leader>l <cmd>lua require'telescope.builtin'.builtin{}<CR>
 nnoremap <Leader>b <cmd>lua require'telescope.builtin'.buffers{}<CR>
-
-nmap [[ :bp<Cr> 
-nmap ]] :bn<Cr> 
-nmap <Leader>j ddp
-nmap <Leader>k ddkP
 
 " Switch between panes with alt
 nmap <silent> <A-Up> :wincmd k<CR>
@@ -258,6 +251,3 @@ let g:previm_open_cmd = 'brave-browser'
 
 " Easy nvim config
 nmap <Leader>n :tabedit ~/.config/nvim/init.vim<Cr>
-
-" GLSL
-autocmd! BufNewFile,BufRead *.vs,*.fs set ft=glsl

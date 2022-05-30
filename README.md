@@ -6,6 +6,5 @@ All my config files.
 * fd
 * fzf
 * ripgrep
-* pikaur (for arch)
 * aplay (music stream)
 * fisherman, z plugin

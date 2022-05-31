@@ -1,0 +1,6 @@
+services:
+  arch_linux:
+    build: .
+    volumes:
+      - ./scripts:/home
+    command: tail -f /var/log/pacman.log

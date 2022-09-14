@@ -121,6 +121,7 @@ inoremap <silent><expr> <TAB>
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -185,23 +186,18 @@ nmap <silent> <A-Left> :wincmd h<CR>
 nmap <silent> <A-Right> :wincmd l<CR>
 
 " To use `ALT+{h,j,k,l}` to navigate windows from any mode:
-tnoremap <A-h> <C-\><C-N><C-w>h
-tnoremap <A-j> <C-\><C-N><C-w>j
-tnoremap <A-k> <C-\><C-N><C-w>k
-tnoremap <A-l> <C-\><C-N><C-w>l
-inoremap <A-h> <C-\><C-N><C-w>h
-inoremap <A-j> <C-\><C-N><C-w>j
-inoremap <A-k> <C-\><C-N><C-w>k
-inoremap <A-l> <C-\><C-N><C-w>l
-nnoremap <A-h> <C-w>h
-nnoremap <A-j> <C-w>j
-nnoremap <A-k> <C-w>k
-nnoremap <A-l> <C-w>l
-
-tmap <silent> <A-Up> <A-k>
-tmap <silent> <A-Down> <A-j>
-tmap <silent> <A-Left> <A-h>
-tmap <silent> <A-Right> <A-l>
+tnoremap <A-Left> <C-\><C-n><C-w>h
+tnoremap <A-Down> <C-\><C-n><C-w>j
+tnoremap <A-Up> <C-\><C-n><C-w>k
+tnoremap <A-Right> <C-\><C-n><C-w>l
+inoremap <A-Left> <C-\><C-n><C-w>h
+inoremap <A-Down> <C-\><C-n><C-w>j
+inoremap <A-Up> <C-\><C-n><C-w>k
+inoremap <A-Right> <C-\><C-n><C-w>l
+nnoremap <A-Left> <C-w>h
+nnoremap <A-Down> <C-w>j
+nnoremap <A-Up> <C-w>k
+nnoremap <A-Right> <C-w>l
 
 set splitright " Splits pane to the right
 set splitbelow " Splits pane below
@@ -211,15 +207,12 @@ lua require("custom_telescope")
 autocmd BufWinEnter,WinEnter term://* startinsert
 nmap <silent> <leader>ts :vsplit<CR>:terminal<CR>i
 nmap <silent> <leader>tt :tabe<CR>:terminal<CR>i
+nmap <silent> <leader>tr :terminal<CR>i
 
-tmap <leader><esc> <c-\><c-n>
-tmap <leader>e i<esc>:bw!<CR>
+tmap <leader><esc> <c-\><c-n><esc>
+tmap <leader>e exit<cr>
+"tmap nvim *<cr> <c-\><c-n>
 nmap <leader>e i<esc>:bw<CR>
-
-tmap <silent> <A-Up> <esc>:wincmd k<CR>
-tmap <silent> <A-Down> <esc>:wincmd j<CR>
-tmap <silent> <A-Left> <esc>:wincmd h<CR>
-tmap <silent> <A-Right> <esc>:wincmd l<CR>
 
 nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
 nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"

@@ -1,4 +1,3 @@
-# Keyring
 set -gx npm_config_prefix ~/.nodemodules
 set -g fish_prompt_pwd_dir_length 0
 

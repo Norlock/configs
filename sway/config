@@ -52,6 +52,8 @@ output HDMI-A-1 bg ~/Projects/configs/images/wallpapers/disharmonium.jpg fit #00
 # Basics:
 #
 
+bindsym $mod+n exec wlsunset
+
 # start a terminal
 bindsym $mod+Return exec $term
 

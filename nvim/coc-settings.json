@@ -6,10 +6,8 @@
       "rootPatterns": ["elm.json"]
     }
   },
-  // If you use neovim you can enable codelenses with this
   "codeLens.enable": true,
-  "rust-analyzer.procMacro.enable": true,
-  "rust-analyzer.updates.channel": "nightly",
-  "rust-analyzer.cargo.loadOutDirsFromCheck": true,
-  "coc.preferences.formatOnSaveFiletypes": ["scss", "markdown", "html", "elm", "typescript", "rust", "javascript", "vue", "java", "lua"]
+  "coc.preferences.formatOnSaveFiletypes": ["scss", "markdown", "html", "elm", "typescript", "typescriptreact", "rust", "lua"]
 }
+
+

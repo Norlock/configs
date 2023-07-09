@@ -1,22 +1,20 @@
 local path = require("plenary.path")
---local user_win = vim.api.nvim_get_current_win()
--- TODO remember position row position in buffer when navigating
-
-local function dump(o)
-    if type(o) == 'table' then
-        local s = '{ '
-        for k, v in pairs(o) do
-            if type(k) ~= 'number' then k = '"' .. k .. '"' end
-            s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
-        end
-        return s .. '} '
-    else
-        return tostring(o)
-    end
-end
 
 local function debug(val)
-    print(vim.inspect(val))
+    local function dump(o)
+        if type(o) == 'table' then
+            local s = '{ '
+            for k, v in pairs(o) do
+                if type(k) ~= 'number' then k = '"' .. k .. '"' end
+                s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
+            end
+            return s .. '} '
+        else
+            return tostring(o)
+        end
+    end
+
+    print(dump(val))
 end
 
 local function round(num)
@@ -27,7 +25,6 @@ local function round(num)
         return math.floor(num)
     end
 end
-
 
 local function getBufferContent(dir_path)
     local buf_content = {}
@@ -83,8 +80,7 @@ local function openNavigation()
     local function setWindowCursor()
         for i, buf_dir_name in ipairs(state.buf_content) do
             for _, his_event in pairs(state.history) do
-                if buf_dir_name == his_event.next_dir_name then
-                    --debug(k)
+                if buf_dir_name == his_event.next_item_name then
                     vim.api.nvim_win_set_cursor(state.win_id, { i, 0 })
                     return
                 end
@@ -117,46 +113,55 @@ local function openNavigation()
     end
 
     local function navigateToParent()
-        -- aanpassen aan current 
-        local cursor = vim.api.nvim_win_get_cursor(state.win_id)
         local current_dir_abs = path:new(state.dir_path):absolute()
 
         if current_dir_abs == "/" then
             return
         end
 
-        local parent_dir_abs = path:new(current_dir_abs):parent():absolute()
-        local next_dir_name
-        --local next_dir_name = state.buf_content[cursor[1]]
+        local cursor = vim.api.nvim_win_get_cursor(state.win_id)
+        local current_next_item_name = state.buf_content[cursor[1]]
 
-        if parent_dir_abs ~= "/" then
-            parent_dir_abs = parent_dir_abs .. "/"
-            next_dir_name = current_dir_abs:gsub("%" .. parent_dir_abs, "")
-        else
-            next_dir_name = current_dir_abs:sub(2)
+        local parent_dir_abs = path:new(current_dir_abs):parent():absolute()
+
+        local function getNextParentItemName()
+            if parent_dir_abs ~= "/" then
+                parent_dir_abs = parent_dir_abs .. "/"
+                return current_dir_abs:gsub("%" .. parent_dir_abs, "")
+            else
+                return current_dir_abs:sub(2)
+            end
         end
 
-        local function getHistoryIndex()
-            for i,v in ipairs(state.history) do
-                if v.parent_dir_abs == parent_dir_abs then
+        local function getHistoryIndex(cmp_path)
+            for i, v in ipairs(state.history) do
+                if v.parent_dir_abs == cmp_path then
                     return i
                 end
             end
             return -1
         end
 
-        local his_index = getHistoryIndex()
-
-        if his_index == -1 then
-            table.insert(state.history, {
-                parent_dir_abs = parent_dir_abs,
-                next_dir_name = next_dir_name,
-            })
-        else
-            state.history[his_index].next_dir_name = next_dir_name
+        local function updateHistoryEvent(his_index, dir_abs, item_name)
+            if his_index == -1 then
+                table.insert(state.history, {
+                    parent_dir_abs = dir_abs,
+                    next_item_name = item_name,
+                })
+            else
+                state.history[his_index].next_item_name = item_name
+            end
         end
 
-        debug(dump(next_dir_name))
+        local parent_next_item_name = getNextParentItemName()
+
+        local current_his_index = getHistoryIndex(current_dir_abs)
+        local parent_his_index = getHistoryIndex(parent_dir_abs)
+
+        updateHistoryEvent(current_his_index, current_dir_abs, current_next_item_name)
+        updateHistoryEvent(parent_his_index, parent_dir_abs, parent_next_item_name)
+
+        --debug(dump(parent_next_item_name))
 
         setBufferContent(parent_dir_abs)
         setWindowCursor()

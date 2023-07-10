@@ -1,21 +1,6 @@
+local fmTheming = require("fm-theming")
+local fmGlobals = require("fm-globals")
 local path = require("plenary.path")
-
-local function debug(val)
-    local function dump(o)
-        if type(o) == 'table' then
-            local s = '{ '
-            for k, v in pairs(o) do
-                if type(k) ~= 'number' then k = '"' .. k .. '"' end
-                s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
-            end
-            return s .. '} '
-        else
-            return tostring(o)
-        end
-    end
-
-    print(dump(val))
-end
 
 local function round(num)
     local fraction = num % 1
@@ -26,7 +11,7 @@ local function round(num)
     end
 end
 
-local function getBufferContent(dir_path)
+local function get_buffer_content(dir_path)
     local buf_content = {}
 
     for item in io.popen("ls -pa " .. dir_path):lines() do
@@ -38,15 +23,10 @@ local function getBufferContent(dir_path)
     return buf_content
 end
 
-local function isItemDirectory(item)
-    local ending = "/" -- TODO windows variant
-    return item:sub(- #ending) == ending
-end
-
 -- Opens the navigation
-local function openNavigation()
+local function open_navigation()
     local state = {
-        buf = vim.api.nvim_create_buf(false, true),
+        buf_id = vim.api.nvim_create_buf(false, true),
         is_open = false,
         os = vim.loop.os_uname().sysname,
         history = {},
@@ -59,25 +39,29 @@ local function openNavigation()
         hSplit = 'split',
     }
 
-    local function setBufferContent(dir)
-        assert(isItemDirectory(dir), "Passed path is not a directory")
+    local function set_buffer_content(dir)
+        assert(fmGlobals.is_item_directory(dir), "Passed path is not a directory")
 
         state.dir_path = dir
-        state.buf_content = getBufferContent(dir)
+        state.buf_content = get_buffer_content(dir)
 
-        vim.api.nvim_buf_set_option(state.buf, 'modifiable', true)
-        vim.api.nvim_buf_set_lines(state.buf, 0, -1, true, state.buf_content)
-        vim.api.nvim_buf_set_option(state.buf, 'modifiable', false)
+        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', true)
+        vim.api.nvim_buf_set_lines(state.buf_id, 0, -1, true, state.buf_content)
+        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', false)
+
+        vim.api.nvim_buf_clear_namespace(state.buf_id, state.ns_id, 1, #state.buf_content)
+
+        fmTheming.theme_buffer_content(state)
     end
 
-    local function closeNavigation()
+    local function close_navigation()
         if state.is_open then
             vim.api.nvim_win_close(state.win_id, false)
             state.is_open = false
         end
     end
 
-    local function setWindowCursor()
+    local function set_window_cursor()
         for i, buf_dir_name in ipairs(state.buf_content) do
             for _, his_event in pairs(state.history) do
                 if buf_dir_name == his_event.next_item_name then
@@ -89,23 +73,23 @@ local function openNavigation()
         vim.api.nvim_win_set_cursor(state.win_id, { 1, 0 })
     end
 
-    local function actionOnItem(cmd_str)
+    local function action_on_item(cmd_str)
         local cursor = vim.api.nvim_win_get_cursor(state.win_id)
         local item = state.buf_content[cursor[1]]
 
-        if isItemDirectory(item) then
+        if fmGlobals.is_item_directory(item) then
             if cmd_str == cmd.open then
-                setBufferContent(state.dir_path .. item)
-                setWindowCursor()
+                set_buffer_content(state.dir_path .. item)
+                set_window_cursor()
             end
         else
             local file_rel = path:new(state.dir_path .. item):make_relative()
-            closeNavigation()
+            close_navigation()
             vim.cmd(cmd_str .. ' ' .. file_rel)
         end
     end
 
-    local function getDirectoryPath(filepath)
+    local function get_directory_path(filepath)
         if state.os == 'Windows' then
             return filepath:match("(.*\\)")
         else
@@ -113,7 +97,7 @@ local function openNavigation()
         end
     end
 
-    local function navigateToParent()
+    local function navigate_to_parent()
         local current_dir_abs = path:new(state.dir_path):absolute()
 
         if current_dir_abs == "/" then
@@ -125,7 +109,7 @@ local function openNavigation()
 
         local parent_dir_abs = path:new(current_dir_abs):parent():absolute()
 
-        local function getNextParentItemName()
+        local function get_next_parent_item_name()
             if parent_dir_abs ~= "/" then
                 parent_dir_abs = parent_dir_abs .. "/"
                 return current_dir_abs:gsub("%" .. parent_dir_abs, "")
@@ -134,7 +118,7 @@ local function openNavigation()
             end
         end
 
-        local function getHistoryIndex(cmp_path)
+        local function get_history_index(cmp_path)
             for i, v in ipairs(state.history) do
                 if v.parent_dir_abs == cmp_path then
                     return i
@@ -143,7 +127,7 @@ local function openNavigation()
             return -1
         end
 
-        local function updateHistoryEvent(his_index, dir_abs, item_name)
+        local function update_history_event(his_index, dir_abs, item_name)
             if his_index == -1 then
                 table.insert(state.history, {
                     parent_dir_abs = dir_abs,
@@ -154,33 +138,21 @@ local function openNavigation()
             end
         end
 
-        local parent_next_item_name = getNextParentItemName()
+        local parent_next_item_name = get_next_parent_item_name()
 
-        local current_his_index = getHistoryIndex(current_dir_abs)
-        local parent_his_index = getHistoryIndex(parent_dir_abs)
+        local current_his_index = get_history_index(current_dir_abs)
+        local parent_his_index = get_history_index(parent_dir_abs)
 
-        updateHistoryEvent(current_his_index, current_dir_abs, current_next_item_name)
-        updateHistoryEvent(parent_his_index, parent_dir_abs, parent_next_item_name)
+        update_history_event(current_his_index, current_dir_abs, current_next_item_name)
+        update_history_event(parent_his_index, parent_dir_abs, parent_next_item_name)
 
         --debug(dump(parent_next_item_name))
 
-        setBufferContent(parent_dir_abs)
-        setWindowCursor()
+        set_buffer_content(parent_dir_abs)
+        set_window_cursor()
     end
 
     local function init()
-        -- Get the current buffer directory
-        local current_file = vim.api.nvim_buf_get_name(0)
-
-        if current_file ~= "" then
-            -- TODO create function that fills table based on OS
-            -- (windows) opt.seperator = "\", (linux) opt.seperator = "/"
-
-            local file_dir = getDirectoryPath(current_file)
-            setBufferContent(file_dir)
-        else
-            setBufferContent("./")
-        end
 
         local ui = vim.api.nvim_list_uis()[1]
 
@@ -200,22 +172,35 @@ local function openNavigation()
             title_pos = 'center',
         }
 
-        state.win_id = vim.api.nvim_open_win(state.buf, true, options)
+        state.win_id = vim.api.nvim_open_win(state.buf_id, true, options)
         state.is_open = true;
 
         vim.api.nvim_win_set_option(state.win_id, 'winhighlight', 'NormalFloat:Normal,FloatBorder:Normal')
+        fmTheming.add_theming(state)
 
-        local buffer_options = { silent = true, buffer = state.buf }
-        vim.keymap.set('n', 'q', closeNavigation, buffer_options)
-        vim.keymap.set('n', '<Cr>', function() actionOnItem(cmd.open) end, buffer_options)
-        vim.keymap.set('n', '<Right>', function() actionOnItem(cmd.open) end, buffer_options)
-        vim.keymap.set('n', 'v', function() actionOnItem(cmd.vSplit) end, buffer_options)
-        vim.keymap.set('n', 'h', function() actionOnItem(cmd.hSplit) end, buffer_options)
-        vim.keymap.set('n', 't', function() actionOnItem(cmd.openTab) end, buffer_options)
-        vim.keymap.set('n', '<Left>', navigateToParent, buffer_options)
+        local buffer_options = { silent = true, buffer = state.buf_id }
+        vim.keymap.set('n', 'q', close_navigation, buffer_options)
+        vim.keymap.set('n', '<Cr>', function() action_on_item(cmd.open) end, buffer_options)
+        vim.keymap.set('n', '<Right>', function() action_on_item(cmd.open) end, buffer_options)
+        vim.keymap.set('n', 'v', function() action_on_item(cmd.vSplit) end, buffer_options)
+        vim.keymap.set('n', 'h', function() action_on_item(cmd.hSplit) end, buffer_options)
+        vim.keymap.set('n', 't', function() action_on_item(cmd.openTab) end, buffer_options)
+        vim.keymap.set('n', '<Left>', navigate_to_parent, buffer_options)
+
+        -- Get the current buffer directory
+        local current_file = vim.api.nvim_buf_get_name(0)
+
+        if current_file ~= "" then
+            -- TODO create function that fills table based on OS
+            -- (windows) opt.seperator = "\", (linux) opt.seperator = "/"
+            local file_dir = get_directory_path(current_file)
+            set_buffer_content(file_dir)
+        else
+            set_buffer_content("./")
+        end
     end
 
     init()
 end
 
-vim.keymap.set('n', '<leader>o', openNavigation, {})
+vim.keymap.set('n', '<leader>o', open_navigation, {})

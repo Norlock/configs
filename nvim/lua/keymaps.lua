@@ -70,15 +70,3 @@ vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
 vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, {})
-
-local actions = require("telescope.actions")
-
-require("telescope").setup({
-    defaults = {
-        mappings = {
-            i = {
-                ["<Esc>"] = actions.close,
-            },
-        },
-    },
-})

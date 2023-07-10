@@ -63,7 +63,7 @@ local function open_navigation()
     local function set_window_cursor()
         for i, buf_dir_name in ipairs(state.buf_content) do
             for _, his_event in pairs(state.history) do
-                if buf_dir_name == his_event.next_item_name then
+                if buf_dir_name == his_event.item_name then
                     vim.api.nvim_win_set_cursor(state.win_id, { i, 0 })
                     return
                 end
@@ -97,58 +97,65 @@ local function open_navigation()
     end
 
     local function navigate_to_parent()
-        local current_dir_abs = path:new(state.dir_path):absolute()
-
-        if current_dir_abs == "/" then
+        if state.dir_path == "/" then
             return
         end
 
-        local cursor = vim.api.nvim_win_get_cursor(state.win_id)
-        local current_next_item_name = state.buf_content[cursor[1]]
+        local function create_event(dir_abs, item_name)
+            return {
+                dir_abs = dir_abs,
+                item_name = item_name,
+            }
+        end
 
-        local parent_dir_abs = path:new(current_dir_abs):parent():absolute()
+        local function get_current_event()
+            local cursor = vim.api.nvim_win_get_cursor(state.win_id)
+            local item_name = state.buf_content[cursor[1]]
 
-        local function get_next_parent_item_name()
-            if parent_dir_abs ~= "/" then
-                parent_dir_abs = parent_dir_abs .. "/"
-                return current_dir_abs:gsub("%" .. parent_dir_abs, "")
-            else
-                return current_dir_abs:sub(2)
+            return create_event(state.dir_path, item_name)
+        end
+
+        local function get_parent_event()
+            local parts = fmGlobals.split(state.dir_path, "/")
+            local item_name = table.remove(parts, #parts)
+
+            local dir_abs = "/"
+            for _, value in ipairs(parts) do
+                dir_abs = dir_abs .. value .. "/"
             end
+
+            return create_event(dir_abs, item_name .. "/")
         end
 
         local function get_history_index(cmp_path)
             for i, v in ipairs(state.history) do
-                if v.parent_dir_abs == cmp_path then
+                if v.dir_abs == cmp_path then
                     return i
                 end
             end
             return -1
         end
 
-        local function update_history_event(his_index, dir_abs, item_name)
+        local function update_history_event(event)
+            local his_index = get_history_index(event.dir_abs)
+
             if his_index == -1 then
-                table.insert(state.history, {
-                    parent_dir_abs = dir_abs,
-                    next_item_name = item_name,
-                })
+                table.insert(state.history, event)
             else
-                state.history[his_index].next_item_name = item_name
+                state.history[his_index].item_name = event.item_name
             end
         end
 
-        local parent_next_item_name = get_next_parent_item_name()
+        local current_event = get_current_event()
+        local parent_event = get_parent_event()
 
-        local current_his_index = get_history_index(current_dir_abs)
-        local parent_his_index = get_history_index(parent_dir_abs)
+        update_history_event(current_event)
+        update_history_event(parent_event)
 
-        update_history_event(current_his_index, current_dir_abs, current_next_item_name)
-        update_history_event(parent_his_index, parent_dir_abs, parent_next_item_name)
-
-        --debug(dump(parent_next_item_name))
-
-        set_buffer_content(parent_dir_abs)
+        set_buffer_content(parent_event.dir_abs)
         set_window_cursor()
+
+        fmGlobals.debug(state.history)
     end
 
     local function init()
@@ -187,13 +194,14 @@ local function open_navigation()
         -- Get the current buffer directory
         local current_file = vim.api.nvim_buf_get_name(0)
 
+        fmGlobals.debug(current_file);
         if current_file ~= "" then
             -- TODO create function that fills table based on OS
             -- (windows) opt.seperator = "\", (linux) opt.seperator = "/"
             local file_dir = get_directory_path(current_file)
-            set_buffer_content(file_dir)
+            set_buffer_content(path:new(file_dir):absolute() .. "/")
         else
-            set_buffer_content("./")
+            set_buffer_content(path:new("./"):absolute() .. "/")
         end
     end
 

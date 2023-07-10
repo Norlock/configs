@@ -6,20 +6,22 @@ function M.is_item_directory(item)
 end
 
 function M.debug(val)
-    local function dump(o)
-        if type(o) == 'table' then
-            local s = '{ '
-            for k, v in pairs(o) do
-                if type(k) ~= 'number' then k = '"' .. k .. '"' end
-                s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
-            end
-            return s .. '} '
-        else
-            return tostring(o)
-        end
+    local filewrite = io.open("tempfile", "a+")
+    if filewrite == nil then
+        print("niet gelukt")
+        return
     end
 
-    print(dump(val))
+    filewrite:write(vim.inspect(val) .. "\n\n")
+    filewrite:close()
+end
+
+function M.split(str, sep)
+   local parts ={}
+   for part in string.gmatch(str, "([^"..sep.."]+)") do
+      table.insert(parts, part)
+   end
+   return parts
 end
 
 return M

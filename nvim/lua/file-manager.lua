@@ -175,7 +175,6 @@ local function open_navigation()
         state.win_id = vim.api.nvim_open_win(state.buf_id, true, options)
         state.is_open = true;
 
-        vim.api.nvim_win_set_option(state.win_id, 'winhighlight', 'NormalFloat:Normal,FloatBorder:Normal')
         fmTheming.add_theming(state)
 
         local buffer_options = { silent = true, buffer = state.buf_id }

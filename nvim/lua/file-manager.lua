@@ -86,6 +86,7 @@ local function openNavigation()
                 end
             end
         end
+        vim.api.nvim_win_set_cursor(state.win_id, { 1, 0 })
     end
 
     local function actionOnItem(cmd_str)

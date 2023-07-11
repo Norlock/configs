@@ -3,8 +3,6 @@ local fmGlobals = require("fm-globals")
 local fmPopup = require("fm-popup")
 local path = require("plenary.path")
 
-local M = {}
-
 local function get_buffer_content(dir_path)
     local buf_content = {}
 
@@ -71,12 +69,12 @@ local function open_navigation()
         set_window_cursor()
     end
 
-    function M.reload()
+    local function reload()
         -- TODO bij verwijderen kijk in history
         set_buffer_content(state.dir_path)
     end
 
-    function M.get_dir_path()
+    local function get_dir_path()
         return state.dir_path
     end
 
@@ -174,6 +172,10 @@ local function open_navigation()
         fmTheming.add_theming(state)
 
         local buffer_options = { silent = true, buffer = state.buf_id }
+        local function create_mkdir_popup()
+            local dp = path:new(state.dir_path):make_relative() .. "/"
+            fmPopup.create_dir_popup(dp, reload)
+        end
 
         vim.keymap.set('n', 'q', close_navigation, buffer_options)
         vim.keymap.set('n', '<Esc>', close_navigation, buffer_options)
@@ -183,7 +185,7 @@ local function open_navigation()
         vim.keymap.set('n', 'v', function() action_on_item(cmd.vSplit) end, buffer_options)
         vim.keymap.set('n', 's', function() action_on_item(cmd.hSplit) end, buffer_options)
         vim.keymap.set('n', 't', function() action_on_item(cmd.openTab) end, buffer_options)
-        vim.keymap.set('n', 'cd', function() fmPopup.create_dir_popup(M) end, buffer_options)
+        vim.keymap.set('n', 'cd', create_mkdir_popup, buffer_options)
         vim.keymap.set('n', '<Left>', navigate_to_parent, buffer_options)
         vim.keymap.set('n', 'h', navigate_to_parent, buffer_options)
         vim.keymap.set('n', '<F1>', '', buffer_options)

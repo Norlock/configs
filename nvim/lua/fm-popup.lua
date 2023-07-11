@@ -3,7 +3,7 @@ local fmTheming = require("fm-theming")
 
 local M = {}
 
-function M.create_dir_popup(fmMod)
+function M.create_dir_popup(dir_path, reload)
     -- action popup state
     local state = {
         buf_id = vim.api.nvim_create_buf(false, true),
@@ -26,13 +26,13 @@ function M.create_dir_popup(fmMod)
         local cmd = "!mkdir"
 
         for _, item in ipairs(parts) do
-            cmd = cmd .. " " .. fmMod.get_dir_path() .. item
+            cmd = cmd .. " " .. dir_path .. item
         end
 
         fmGlobals.debug(cmd)
         vim.cmd(cmd)
 
-        fmMod.reload()
+        reload()
         close_navigation()
     end
 
@@ -58,7 +58,7 @@ function M.create_dir_popup(fmMod)
         state.is_open = true;
 
         local buffer_options = { silent = true, buffer = state.buf_id }
-        vim.keymap.set('i', '<Esc>', function () close_navigation(state) end, buffer_options)
+        vim.keymap.set('i', '<Esc>', close_navigation, buffer_options)
         vim.keymap.set('i', '<Cr>', create_dir, buffer_options)
 
         fmTheming.add_theming(state)

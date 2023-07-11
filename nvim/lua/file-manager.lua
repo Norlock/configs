@@ -20,18 +20,14 @@ local function create_event(dir_path, item_name)
     }
 end
 
-local state = {
-    buf_id = vim.api.nvim_create_buf(false, true),
-    is_open = false,
-    os = vim.loop.os_uname().sysname,
-    history = {},
-}
-
 -- Opens the navigation
 local function open_navigation()
-    if state.is_open then
-        return
-    end
+    local state = {
+        buf_id = vim.api.nvim_create_buf(false, true),
+        is_open = false,
+        os = vim.loop.os_uname().sysname,
+        history = {},
+    }
 
     local cmd = {
         open = 'e',
@@ -146,8 +142,7 @@ local function open_navigation()
     end
 
     local function init()
-        local current_file = vim.api.nvim_buf_get_name(0)
-        local fdp = vim.fn.expand('%:p:h') .. "/"
+        local fd = vim.fn.expand('%:p:h') .. "/"
         local fn = vim.fn.expand('%:t')
         local ui = vim.api.nvim_list_uis()[1]
         local width = fmGlobals.round(ui.width * 0.9)
@@ -185,6 +180,19 @@ local function open_navigation()
             fmPopup.create_file_popup(get_relative_path(), reload)
         end
 
+        local function delete_item()
+            local dir_path = get_relative_path()
+            local cursor = vim.api.nvim_win_get_cursor(state.win_id)
+            local item_name = state.buf_content[cursor[1]]
+
+            local sh_cmd = "!rm -rf " .. dir_path .. item_name
+
+            fmGlobals.debug(sh_cmd)
+            vim.cmd(sh_cmd)
+
+            reload()
+        end
+
         vim.keymap.set('n', 'q', close_navigation, buffer_options)
         vim.keymap.set('n', '<Esc>', close_navigation, buffer_options)
         vim.keymap.set('n', '<Right>', function() action_on_item(cmd.open) end, buffer_options)
@@ -195,15 +203,16 @@ local function open_navigation()
         vim.keymap.set('n', 't', function() action_on_item(cmd.openTab) end, buffer_options)
         vim.keymap.set('n', 'cd', create_dir_popup, buffer_options)
         vim.keymap.set('n', 'ct', create_file_popup, buffer_options)
+        vim.keymap.set('n', 'dd', delete_item, buffer_options)
         vim.keymap.set('n', '<Left>', navigate_to_parent, buffer_options)
         vim.keymap.set('n', 'h', navigate_to_parent, buffer_options)
-        vim.keymap.set('n', '<F1>', '', buffer_options)
+        vim.keymap.set('n', '<F1>', "", buffer_options)
 
-        if current_file ~= "" then
-            table.insert(state.history, create_event(fdp, fn))
-            set_buffer_content(fdp)
+        if fn ~= "" then
+            table.insert(state.history, create_event(fd, fn))
+            set_buffer_content(fd)
         else
-            set_buffer_content(path:new("./"):absolute())
+            set_buffer_content(path:new("./"):absolute() .. "/")
         end
     end
 

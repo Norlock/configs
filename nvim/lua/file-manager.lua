@@ -15,6 +15,13 @@ local function get_buffer_content(dir_path)
     return buf_content
 end
 
+local function create_event(dir_path, item_name)
+    return {
+        dir_path = dir_path,
+        item_name = item_name,
+    }
+end
+
 -- Opens the navigation
 local function open_navigation()
     local state = {
@@ -38,28 +45,6 @@ local function open_navigation()
         end
     end
 
-    local function set_buffer_content(new_dir_path)
-        assert(fmGlobals.is_item_directory(new_dir_path), "Passed path is not a directory")
-
-        state.dir_path = new_dir_path
-        state.buf_content = get_buffer_content(new_dir_path)
-
-        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', true)
-        vim.api.nvim_buf_set_lines(state.buf_id, 0, -1, true, state.buf_content)
-        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', false)
-
-        fmTheming.theme_buffer_content(state)
-    end
-
-    function M.reload()
-        -- TODO bij verwijderen kijk in history
-        set_buffer_content(state.dir_path)
-    end
-
-    function M.get_dir_path()
-        return state.dir_path
-    end
-
     local function set_window_cursor()
         for i, buf_item in ipairs(state.buf_content) do
             for _, event in ipairs(state.history) do
@@ -72,6 +57,29 @@ local function open_navigation()
         vim.api.nvim_win_set_cursor(state.win_id, { 1, 0 })
     end
 
+    local function set_buffer_content(new_dir_path)
+        assert(fmGlobals.is_item_directory(new_dir_path), "Passed path is not a directory")
+
+        state.dir_path = new_dir_path
+        state.buf_content = get_buffer_content(new_dir_path)
+
+        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', true)
+        vim.api.nvim_buf_set_lines(state.buf_id, 0, -1, true, state.buf_content)
+        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', false)
+
+        fmTheming.theme_buffer_content(state)
+        set_window_cursor()
+    end
+
+    function M.reload()
+        -- TODO bij verwijderen kijk in history
+        set_buffer_content(state.dir_path)
+    end
+
+    function M.get_dir_path()
+        return state.dir_path
+    end
+
     local function action_on_item(cmd_str)
         local cursor = vim.api.nvim_win_get_cursor(state.win_id)
         local item = state.buf_content[cursor[1]]
@@ -79,7 +87,6 @@ local function open_navigation()
         if fmGlobals.is_item_directory(item) then
             if cmd_str == cmd.open then
                 set_buffer_content(state.dir_path .. item)
-                set_window_cursor()
             end
         else
             local file_rel = path:new(state.dir_path .. item):make_relative()
@@ -91,13 +98,6 @@ local function open_navigation()
     local function navigate_to_parent()
         if state.dir_path == "/" then
             return
-        end
-
-        local function create_event(dir_path, item_name)
-            return {
-                dir_path = dir_path,
-                item_name = item_name,
-            }
         end
 
         local function get_current_event()
@@ -145,12 +145,12 @@ local function open_navigation()
         update_history_event(parent_event)
 
         set_buffer_content(parent_event.dir_path)
-        set_window_cursor()
     end
 
     local function init()
         local current_file = vim.api.nvim_buf_get_name(0)
-        local fp = vim.fn.expand('%:p:h')
+        local fdp = vim.fn.expand('%:p:h') .. "/"
+        local fn = vim.fn.expand('%:t')
         local ui = vim.api.nvim_list_uis()[1]
         local width = fmGlobals.round(ui.width * 0.9)
         local height = fmGlobals.round(ui.height * 0.8)
@@ -186,9 +186,11 @@ local function open_navigation()
         vim.keymap.set('n', 'cd', function() fmPopup.create_dir_popup(M) end, buffer_options)
         vim.keymap.set('n', '<Left>', navigate_to_parent, buffer_options)
         vim.keymap.set('n', 'h', navigate_to_parent, buffer_options)
+        vim.keymap.set('n', '<F1>', '', buffer_options)
 
         if current_file ~= "" then
-            set_buffer_content(fp .. "/")
+            table.insert(state.history, create_event(fdp, fn))
+            set_buffer_content(fdp)
         else
             set_buffer_content(path:new("./"):absolute())
         end

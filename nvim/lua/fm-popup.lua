@@ -125,9 +125,10 @@ function M.create_error_popup(buf_content, parent_win_id)
             win = parent_win_id,
             width = win_width,
             height = height,
-            row = pos[1] + win_height - height + 1,
+            row = pos[1] + win_height + 1,
             col = pos[2] + 1,
-            anchor = 'NW',
+            --anchor = 'NW',
+            anchor = 'SW',
             style = 'minimal',
             border = 'none',
         }

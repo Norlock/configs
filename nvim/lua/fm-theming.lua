@@ -21,8 +21,8 @@ end
 
 function theming.add_error_theming(state)
     local hlOptions = {
-        fg = "#cccccc",
-        bg = "#ff0000",
+        fg = "#f5f0f6",
+        bg = "#cc2936",
         italic = true,
     }
 

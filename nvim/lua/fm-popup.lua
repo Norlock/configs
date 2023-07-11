@@ -130,7 +130,6 @@ function M.create_error_popup(buf_content, parent_win_id)
             anchor = 'NW',
             style = 'minimal',
             border = 'none',
-            focusable = false,
         }
 
         state.win_id = vim.api.nvim_open_win(state.buf_id, true, win_options)
@@ -141,6 +140,8 @@ function M.create_error_popup(buf_content, parent_win_id)
         vim.keymap.set('n', 'q', close_navigation, buffer_options)
 
         M.set_buffer_content(state, buf_content)
+
+        fmTheming.add_error_theming(state)
     end
 
     init()

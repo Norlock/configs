@@ -1,18 +1,12 @@
 local fmGlobals = require("fm-globals")
 
-local theming = {}
+local theming = {
+    ns_id = vim.api.nvim_create_namespace("FmTheming"),
+    error_ns_id = vim.api.nvim_create_namespace("FmErrorTheming")
+}
 
 function theming.add_theming(state)
-    theming.ns_id = vim.api.nvim_create_namespace("FmTheming")
-
-    theming.hlDirOptions = {
-        --bg = "#ff0000",
-        fg = "#F0E68C",
-    }
-
-    theming.hlCursorLine = {
-        --fg = "#222222",
-        --bg = "#555555",
+    local hlCursorLine = {
         bold = true,
     }
 
@@ -20,9 +14,23 @@ function theming.add_theming(state)
 
     vim.api.nvim_set_hl(theming.ns_id, 'Normal', {})
     vim.api.nvim_set_hl(theming.ns_id, 'FloatBorder', {})
-    vim.api.nvim_set_hl(theming.ns_id, 'CursorLine', theming.hlCursorLine)
+    vim.api.nvim_set_hl(theming.ns_id, 'CursorLine', hlCursorLine)
 
     vim.api.nvim_win_set_hl_ns(state.win_id, theming.ns_id)
+end
+
+function theming.add_error_theming(state)
+    local hlOptions = {
+        fg = "#cccccc",
+        bg = "#ff0000",
+        italic = true,
+    }
+
+    vim.api.nvim_set_hl(theming.error_ns_id, 'Normal', {})
+    vim.api.nvim_set_hl(theming.error_ns_id, 'FloatBorder', {})
+    vim.api.nvim_set_hl(theming.error_ns_id, 'Normal', hlOptions)
+
+    vim.api.nvim_win_set_hl_ns(state.win_id, theming.error_ns_id)
 end
 
 function theming.theme_buffer_content(state)

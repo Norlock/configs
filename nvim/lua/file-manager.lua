@@ -20,14 +20,18 @@ local function create_event(dir_path, item_name)
     }
 end
 
+local state = {
+    buf_id = vim.api.nvim_create_buf(false, true),
+    is_open = false,
+    os = vim.loop.os_uname().sysname,
+    history = {},
+}
+
 -- Opens the navigation
 local function open_navigation()
-    local state = {
-        buf_id = vim.api.nvim_create_buf(false, true),
-        is_open = false,
-        os = vim.loop.os_uname().sysname,
-        history = {},
-    }
+    if state.is_open then
+        return
+    end
 
     local cmd = {
         open = 'e',
@@ -72,10 +76,6 @@ local function open_navigation()
     local function reload()
         -- TODO bij verwijderen kijk in history
         set_buffer_content(state.dir_path)
-    end
-
-    local function get_dir_path()
-        return state.dir_path
     end
 
     local function action_on_item(cmd_str)
@@ -172,9 +172,17 @@ local function open_navigation()
         fmTheming.add_theming(state)
 
         local buffer_options = { silent = true, buffer = state.buf_id }
-        local function create_mkdir_popup()
-            local dp = path:new(state.dir_path):make_relative() .. "/"
-            fmPopup.create_dir_popup(dp, reload)
+
+        local function get_relative_path()
+            return path:new(state.dir_path):make_relative() .. "/"
+        end
+
+        local function create_dir_popup()
+            fmPopup.create_dir_popup(get_relative_path(), reload)
+        end
+
+        local function create_file_popup()
+            fmPopup.create_file_popup(get_relative_path(), reload)
         end
 
         vim.keymap.set('n', 'q', close_navigation, buffer_options)
@@ -185,7 +193,8 @@ local function open_navigation()
         vim.keymap.set('n', 'v', function() action_on_item(cmd.vSplit) end, buffer_options)
         vim.keymap.set('n', 's', function() action_on_item(cmd.hSplit) end, buffer_options)
         vim.keymap.set('n', 't', function() action_on_item(cmd.openTab) end, buffer_options)
-        vim.keymap.set('n', 'cd', create_mkdir_popup, buffer_options)
+        vim.keymap.set('n', 'cd', create_dir_popup, buffer_options)
+        vim.keymap.set('n', 'ct', create_file_popup, buffer_options)
         vim.keymap.set('n', '<Left>', navigate_to_parent, buffer_options)
         vim.keymap.set('n', 'h', navigate_to_parent, buffer_options)
         vim.keymap.set('n', '<F1>', '', buffer_options)

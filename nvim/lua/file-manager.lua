@@ -1,23 +1,15 @@
 local fmTheming = require("fm-theming")
 local fmGlobals = require("fm-globals")
+local fmPopup = require("fm-popup")
 local path = require("plenary.path")
 
-local function round(num)
-    local fraction = num % 1
-    if 0.5 < fraction then
-        return math.ceil(num)
-    else
-        return math.floor(num)
-    end
-end
+local M = {}
 
 local function get_buffer_content(dir_path)
     local buf_content = {}
 
-    for item in io.popen("ls -pa " .. dir_path):lines() do
-        if item ~= "./" and item ~= "../" then
-            table.insert(buf_content, item)
-        end
+    for item in io.popen("ls -pA " .. dir_path):lines() do
+        table.insert(buf_content, item)
     end
 
     return buf_content
@@ -39,6 +31,13 @@ local function open_navigation()
         hSplit = 'split',
     }
 
+    local function close_navigation()
+        if state.is_open then
+            vim.api.nvim_win_close(state.win_id, false)
+            state.is_open = false
+        end
+    end
+
     local function set_buffer_content(new_dir_path)
         assert(fmGlobals.is_item_directory(new_dir_path), "Passed path is not a directory")
 
@@ -52,12 +51,13 @@ local function open_navigation()
         fmTheming.theme_buffer_content(state)
     end
 
-    local function close_navigation()
-        if state.is_open then
-            vim.cmd([[set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20]])
-            vim.api.nvim_win_close(state.win_id, false)
-            state.is_open = false
-        end
+    function M.reload()
+        -- TODO bij verwijderen kijk in history
+        set_buffer_content(state.dir_path)
+    end
+
+    function M.get_dir_path()
+        return state.dir_path
     end
 
     local function set_window_cursor()
@@ -85,14 +85,6 @@ local function open_navigation()
             local file_rel = path:new(state.dir_path .. item):make_relative()
             close_navigation()
             vim.cmd(cmd_str .. ' ' .. file_rel)
-        end
-    end
-
-    local function get_directory_path(filepath)
-        if state.os == 'Windows' then
-            return filepath:match("(.*\\)")
-        else
-            return filepath:match("(.*/)")
         end
     end
 
@@ -154,15 +146,14 @@ local function open_navigation()
 
         set_buffer_content(parent_event.dir_path)
         set_window_cursor()
-
-        --fmGlobals.debug(state.history)
     end
 
     local function init()
         local current_file = vim.api.nvim_buf_get_name(0)
+        local fp = vim.fn.expand('%:p:h')
         local ui = vim.api.nvim_list_uis()[1]
-        local width = round(ui.width * 0.9)
-        local height = round(ui.height * 0.8)
+        local width = fmGlobals.round(ui.width * 0.9)
+        local height = fmGlobals.round(ui.height * 0.8)
 
         local options = {
             relative = 'editor',
@@ -173,7 +164,7 @@ local function open_navigation()
             anchor = 'NW',
             style = 'minimal',
             border = 'rounded',
-            title = 'File manager',
+            title = ' File manager / ? ',
             title_pos = 'center',
         }
 
@@ -185,20 +176,19 @@ local function open_navigation()
         local buffer_options = { silent = true, buffer = state.buf_id }
 
         vim.keymap.set('n', 'q', close_navigation, buffer_options)
+        vim.keymap.set('n', '<Esc>', close_navigation, buffer_options)
         vim.keymap.set('n', '<Right>', function() action_on_item(cmd.open) end, buffer_options)
+        vim.keymap.set('n', 'l', function() action_on_item(cmd.open) end, buffer_options)
         vim.keymap.set('n', '<Cr>', function() action_on_item(cmd.open) end, buffer_options)
         vim.keymap.set('n', 'v', function() action_on_item(cmd.vSplit) end, buffer_options)
         vim.keymap.set('n', 's', function() action_on_item(cmd.hSplit) end, buffer_options)
         vim.keymap.set('n', 't', function() action_on_item(cmd.openTab) end, buffer_options)
+        vim.keymap.set('n', 'cd', function() fmPopup.create_dir_popup(M) end, buffer_options)
         vim.keymap.set('n', '<Left>', navigate_to_parent, buffer_options)
+        vim.keymap.set('n', 'h', navigate_to_parent, buffer_options)
 
         if current_file ~= "" then
-            -- TODO create function that fills table based on OS
-            -- (windows) opt.seperator = "\", (linux) opt.seperator = "/"
-            local file_dir = get_directory_path(current_file)
-            -- TODO all toevoegen aan events
-
-            set_buffer_content(path:new(file_dir):absolute())
+            set_buffer_content(fp .. "/")
         else
             set_buffer_content(path:new("./"):absolute())
         end

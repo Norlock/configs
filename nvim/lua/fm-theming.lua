@@ -11,8 +11,9 @@ function theming.add_theming(state)
     }
 
     theming.hlCursorLine = {
-        fg = "#333333",
-        bg = "#E1D67C",
+        --fg = "#222222",
+        --bg = "#555555",
+        bold = true,
     }
 
     vim.opt_local.cursorline = true
@@ -22,7 +23,6 @@ function theming.add_theming(state)
     vim.api.nvim_set_hl(theming.ns_id, 'CursorLine', theming.hlCursorLine)
 
     vim.api.nvim_win_set_hl_ns(state.win_id, theming.ns_id)
-    vim.cmd([[set guicursor=n:ver25]])
 end
 
 function theming.theme_buffer_content(state)

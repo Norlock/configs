@@ -13,6 +13,7 @@ return require('packer').startup(function(use)
     -- Themes
     use 'neanias/everforest-nvim'
     use "rebelot/kanagawa.nvim"
+    use "morhetz/gruvbox"
     use 'nvim-tree/nvim-web-devicons'
     use 'nvim-lualine/lualine.nvim'
     use 'xiyaowong/transparent.nvim'

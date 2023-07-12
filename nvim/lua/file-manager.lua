@@ -185,12 +185,24 @@ local function open_navigation()
             local cursor = vim.api.nvim_win_get_cursor(state.win_id)
             local item_name = state.buf_content[cursor[1]]
 
-            local sh_cmd = "!rm -rf " .. dir_path .. item_name
+            local function create_sh_cmd()
+                if fmGlobals.is_item_directory(item_name) then
+                    return "rm -rf " .. dir_path .. item_name
+                else
+                    return "rm " .. dir_path .. item_name
+                end
+            end
 
-            fmGlobals.debug(sh_cmd)
-            vim.cmd(sh_cmd)
+            local sh_cmd = { create_sh_cmd() }
+            local popup = fmPopup.create_delete_item_popup(sh_cmd, state.win_id)
 
-            reload()
+            local function confirm_callback()
+                vim.fn.systemlist(sh_cmd[1])
+                reload()
+                popup.close_navigation()
+            end
+
+            popup.set_keymap('<Cr>', confirm_callback)
         end
 
         vim.keymap.set('n', 'q', close_navigation, buffer_options)

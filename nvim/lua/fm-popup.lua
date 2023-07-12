@@ -11,7 +11,7 @@ local function create_simple_state()
     }
 end
 
-local function create_popup(dir_path, reload, cmd_options)
+local function create_cmd_popup(dir_path, reload, cmd_options)
     local state = create_simple_state()
 
     local function close_navigation()
@@ -39,7 +39,7 @@ local function create_popup(dir_path, reload, cmd_options)
 
         if #output ~= 0 then
             fmGlobals.debug(output)
-            M.create_error_popup(output, state.win_id)
+            M.create_info_popup(output, state.win_id, 'Command failed (Esc / q)')
         end
     end
 
@@ -59,6 +59,7 @@ local function create_popup(dir_path, reload, cmd_options)
             border = 'rounded',
             title = cmd_options.title,
             title_pos = 'center',
+            noautocmd = true,
         }
 
         state.win_id = vim.api.nvim_open_win(state.buf_id, true, win_options)
@@ -75,13 +76,21 @@ local function create_popup(dir_path, reload, cmd_options)
     init()
 end
 
+function M.create_delete_item_popup(buf_content, parent_win_id)
+    local popup = M.create_info_popup(buf_content, parent_win_id,
+        'Confirm (Enter), cancel (Esc / q)')
+
+    fmGlobals.debug(popup)
+    return popup
+end
+
 function M.create_file_popup(dir_path, reload)
     local options = {
         title = ' touch ',
         sh_cmd = 'touch'
     }
 
-    create_popup(dir_path, reload, options)
+    create_cmd_popup(dir_path, reload, options)
 end
 
 function M.create_dir_popup(dir_path, reload)
@@ -90,33 +99,35 @@ function M.create_dir_popup(dir_path, reload)
         sh_cmd = 'mkdir'
     }
 
-    create_popup(dir_path, reload, options)
+    create_cmd_popup(dir_path, reload, options)
 end
 
-function M.set_buffer_content(state, buf_content)
-    state.buf_content = buf_content
-
-    vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', true)
-    vim.api.nvim_buf_set_lines(state.buf_id, 0, -1, true, state.buf_content)
-    vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', false)
-
-    fmTheming.theme_buffer_content(state)
-end
-
-function M.create_error_popup(buf_content, parent_win_id)
+-- options = {
+--    buf_content, parent_win_id, title
+-- }
+function M.create_info_popup(buf_content, parent_win_id, title)
+    local popup = {}
     local state = create_simple_state()
+    popup.state = state
 
-    local function close_navigation()
+    function popup.close_navigation()
         if state.is_open then
             vim.api.nvim_win_close(state.win_id, false)
             state.is_open = false
         end
     end
 
+    function popup.set_buffer_content()
+        state.buf_content = buf_content
+
+        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', true)
+        vim.api.nvim_buf_set_lines(state.buf_id, 0, -1, true, state.buf_content)
+        vim.api.nvim_buf_set_option(state.buf_id, 'modifiable', false)
+
+        fmTheming.theme_buffer_content(state)
+    end
+
     local function init()
-        --local ui = vim.api.nvim_list_uis()[1]
-        --local win_width = ui.width
-        --local win_height = ui.height
         local win_width = vim.api.nvim_win_get_width(0)
         local win_height = vim.api.nvim_win_get_height(0)
         local pos = vim.api.nvim_win_get_position(0)
@@ -127,28 +138,35 @@ function M.create_error_popup(buf_content, parent_win_id)
             win = parent_win_id,
             width = win_width,
             height = height,
-            row = pos[1] + win_height + 2,
-            col = pos[2],
+            row = pos[1] + win_height,
+            col = -1,
             anchor = 'SW',
             style = 'minimal',
             border = 'single',
-            title = ' Error (Esc / q) ',
+            title = ' ' .. title .. ' ',
             title_pos = "right",
+            noautocmd = true,
         }
 
         state.win_id = vim.api.nvim_open_win(state.buf_id, true, win_options)
         state.is_open = true;
+        state.buffer_options = { silent = true, buffer = state.buf_id }
 
-        local buffer_options = { silent = true, buffer = state.buf_id }
-        vim.keymap.set('n', '<Esc>', close_navigation, buffer_options)
-        vim.keymap.set('n', 'q', close_navigation, buffer_options)
+        vim.keymap.set('n', '<Esc>', popup.close_navigation, state.buffer_options)
+        vim.keymap.set('n', 'q', popup.close_navigation, state.buffer_options)
 
-        M.set_buffer_content(state, buf_content)
+        popup.set_buffer_content()
 
         fmTheming.add_error_theming(state)
     end
 
     init()
+
+    function popup.set_keymap(lhs, rhs)
+        vim.keymap.set('n', lhs, rhs, state.buffer_options)
+    end
+
+    return popup
 end
 
 return M

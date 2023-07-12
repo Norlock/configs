@@ -20,20 +20,13 @@ function theming.add_theming(state)
 end
 
 function theming.add_error_theming(state)
-    local hlOptions = {
-        --fg = "#f5f0f6",
-        --bg = "#cc2936",
-        italic = true,
-        --link = "Error"
+    local hlBorder = {
+        link = "Question",
     }
 
-    local hlFbOptions = {
-        link = "Error"
-    }
-
-    vim.api.nvim_set_hl(theming.error_ns_id, 'FloatBorder', hlFbOptions)
-    vim.api.nvim_set_hl(theming.error_ns_id, 'FloatTitle', hlFbOptions)
-    vim.api.nvim_set_hl(theming.error_ns_id, 'NormalFloat', hlOptions)
+    vim.api.nvim_set_hl(theming.error_ns_id, 'FloatBorder', hlBorder)
+    vim.api.nvim_set_hl(theming.error_ns_id, 'FloatTitle', hlBorder)
+    vim.api.nvim_set_hl(theming.error_ns_id, 'NormalFloat', { italic = true })
 
     vim.api.nvim_win_set_hl_ns(state.win_id, theming.error_ns_id)
 end

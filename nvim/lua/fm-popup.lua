@@ -219,7 +219,7 @@ function M.create_help_popup(related_win_id)
             noautocmd = true,
         }
 
-        state.win_id = vim.api.nvim_open_win(state.buf_id, false, win_options)
+        state.win_id = vim.api.nvim_open_win(state.buf_id, true, win_options)
         state.is_open = true;
         state.buffer_options = { silent = true, buffer = state.buf_id }
 

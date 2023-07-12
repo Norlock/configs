@@ -157,7 +157,7 @@ local function open_navigation()
             anchor = 'NW',
             style = 'minimal',
             border = 'rounded',
-            title = ' File manager / ? ',
+            title = ' File manager (help: ?) ',
             title_pos = 'center',
         }
 

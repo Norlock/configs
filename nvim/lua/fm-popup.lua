@@ -115,6 +115,8 @@ function M.create_error_popup(buf_content, parent_win_id)
 
     local function init()
         --local ui = vim.api.nvim_list_uis()[1]
+        --local win_width = ui.width
+        --local win_height = ui.height
         local win_width = vim.api.nvim_win_get_width(0)
         local win_height = vim.api.nvim_win_get_height(0)
         local pos = vim.api.nvim_win_get_position(0)
@@ -125,12 +127,13 @@ function M.create_error_popup(buf_content, parent_win_id)
             win = parent_win_id,
             width = win_width,
             height = height,
-            row = pos[1] + win_height + 1,
-            col = pos[2] + 1,
-            --anchor = 'NW',
+            row = pos[1] + win_height + 2,
+            col = pos[2],
             anchor = 'SW',
             style = 'minimal',
-            border = 'none',
+            border = 'single',
+            title = ' Error (Esc / q) ',
+            title_pos = "right",
         }
 
         state.win_id = vim.api.nvim_open_win(state.buf_id, true, win_options)

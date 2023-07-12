@@ -8,20 +8,20 @@ local cmp_mappings = cmp.mapping.preset.insert({
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    ["<Tab>"] = cmp.mapping(function(fallback)
-        if luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
-        else
-            fallback()
-        end
-    end, { "i", "s" }),
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-        if luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-        else
-            fallback()
-        end
-    end, { "i", "s" }),
+    --["<Tab>"] = cmp.mapping(function(fallback)
+        --if luasnip.expand_or_jumpable() then
+            --luasnip.expand_or_jump()
+        --else
+            --fallback()
+        --end
+    --end, { "i", "s" }),
+    --["<S-Tab>"] = cmp.mapping(function(fallback)
+        --if luasnip.jumpable(-1) then
+            --luasnip.jump(-1)
+        --else
+            --fallback()
+        --end
+    --end, { "i", "s" }),
 })
 
 cmp.setup({

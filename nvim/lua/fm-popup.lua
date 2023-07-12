@@ -36,7 +36,6 @@ local function create_cmd_popup(dir_path, title)
             return ""
         end
 
-        --local
         local old_filepath = dir_path .. filename
 
         local first_two_chars = string.sub(user_input, 1, 2)

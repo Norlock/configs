@@ -105,6 +105,11 @@ require("telescope").setup({
     },
 })
 
+-- Filemanager
+local file_manager = require('file-manager')
+
+vim.keymap.set('n', '<leader>o', file_manager.open_navigation, {})
+
 -- Lualine
 require('lualine').setup {
   options = {

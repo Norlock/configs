@@ -1,8 +1,9 @@
-local M = {}
+local M = {
+    os = vim.loop.os_uname().sysname,
+}
 
 function M.is_item_directory(item)
     local ending = "/" -- TODO windows variant
-    --return vim.fn.isdirectory(item)
     return item:sub(- #ending) == ending
 end
 

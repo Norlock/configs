@@ -25,14 +25,30 @@ local function get_cursor_item(state)
     return state.buf_content[cursor[1]]
 end
 
--- Opens the navigation
-local function open_navigation()
-    local state = {
-        buf_id = vim.api.nvim_create_buf(false, true),
+local M = {
+    state = {
         is_open = false,
-        os = vim.loop.os_uname().sysname,
         history = {},
     }
+}
+
+function M.create_new_state()
+    M.state = {
+        buf_id = vim.api.nvim_create_buf(false, true),
+        is_open = false,
+        history = {},
+    }
+
+    return M.state
+end
+
+-- Opens the navigation
+function M.open_navigation()
+    if M.state.is_open then
+        return
+    end
+
+    local state = M.create_new_state();
 
     local cmd = {
         open = 'e',
@@ -75,7 +91,6 @@ local function open_navigation()
     end
 
     local function reload()
-        -- TODO bij verwijderen kijk in history
         set_buffer_content(state.dir_path)
     end
 
@@ -272,4 +287,4 @@ local function open_navigation()
     init()
 end
 
-vim.keymap.set('n', '<leader>o', open_navigation, {})
+return M

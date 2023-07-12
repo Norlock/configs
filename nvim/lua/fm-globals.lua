@@ -34,4 +34,8 @@ function M.split(str, sep)
    return parts
 end
 
+function M.trim(str)
+    return str:match("^%s*(.-)%s*$")
+end
+
 return M

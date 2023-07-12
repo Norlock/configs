@@ -16,7 +16,7 @@ local function init_popup_module()
     return popup, state
 end
 
-local function create_cmd_popup(dir_path, cmd_options)
+local function create_cmd_popup(dir_path, title)
     local popup, state = init_popup_module()
 
     function popup.close_navigation()
@@ -28,16 +28,32 @@ local function create_cmd_popup(dir_path, cmd_options)
     end
 
     function popup.create_rename_cmd(filename)
-        local user_input = vim.api.nvim_buf_get_lines(state.buf_id, 0, 1, false)
-        local filepath = dir_path .. filename
-        return "mv " .. filepath .. user_input[1]
+        local user_input = fmGlobals.trim(
+            vim.api.nvim_buf_get_lines(state.buf_id, 0, 1, false)[1]
+        )
+
+        if user_input == "" then
+            return ""
+        end
+
+        --local
+        local old_filepath = dir_path .. filename
+
+        local first_two_chars = string.sub(user_input, 1, 2)
+        local first_char = string.sub(first_two_chars, 1, 1)
+        if first_char == '/' or first_two_chars == '~/' then -- Absolute path 
+            return "mv " .. old_filepath .. " " .. user_input
+        end
+
+        local new_filepath = dir_path .. user_input
+        return "mv " .. old_filepath .. " " .. new_filepath
     end
 
-    function popup.create_sh_cmd()
+    function popup.create_sh_cmd(sh_cmd)
         local user_input = vim.api.nvim_buf_get_lines(state.buf_id, 0, 1, false)
         local parts = fmGlobals.split(user_input[1], " ")
 
-        local cmd = cmd_options.sh_cmd
+        local cmd = sh_cmd
 
         for _, item in ipairs(parts) do
             cmd = cmd .. " " .. dir_path .. item
@@ -60,7 +76,7 @@ local function create_cmd_popup(dir_path, cmd_options)
             anchor = 'NW',
             style = 'minimal',
             border = 'rounded',
-            title = cmd_options.title,
+            title = title,
             title_pos = 'left',
             noautocmd = true,
         }
@@ -91,30 +107,15 @@ function M.create_delete_item_popup(buf_content, parent_win_id)
 end
 
 function M.create_file_popup(dir_path)
-    local options = {
-        title = ' Touch (separate by space) ',
-        sh_cmd = 'touch'
-    }
-
-    return create_cmd_popup(dir_path, options)
+    return create_cmd_popup(dir_path,  ' Touch (separate by space) ')
 end
 
 function M.create_dir_popup(dir_path)
-    local options = {
-        title = ' Mkdir (separate by space) ',
-        sh_cmd = 'mkdir'
-    }
-
-    return create_cmd_popup(dir_path, options)
+    return create_cmd_popup(dir_path,  ' Mkdir (separate by space) ')
 end
 
-function M.create_rename_popup(dir_path)
-   local options = {
-        title = ' Rename ',
-        sh_cmd = 'mv'
-    }
-
-    return create_cmd_popup(dir_path, options)
+function M.create_move_popup(dir_path)
+    return create_cmd_popup(dir_path,  ' Move (mv) ')
 end
 
 function M.create_info_popup(buf_content, related_win_id, title)

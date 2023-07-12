@@ -1,8 +1,6 @@
 local fmGlobals = require("fm-globals")
 local fmTheming = require("fm-theming")
 
-local M = {}
-
 local function init_popup_module()
     local buf_id = vim.api.nvim_create_buf(false, true)
 
@@ -27,6 +25,12 @@ local function create_cmd_popup(dir_path, cmd_options)
             vim.api.nvim_win_close(state.win_id, false)
             state.is_open = false
         end
+    end
+
+    function popup.create_rename_cmd(filename)
+        local user_input = vim.api.nvim_buf_get_lines(state.buf_id, 0, 1, false)
+        local filepath = dir_path .. filename
+        return "mv " .. filepath .. user_input[1]
     end
 
     function popup.create_sh_cmd()
@@ -79,6 +83,8 @@ local function create_cmd_popup(dir_path, cmd_options)
     return popup
 end
 
+local M = {}
+
 function M.create_delete_item_popup(buf_content, parent_win_id)
     return M.create_info_popup(buf_content, parent_win_id,
         'Confirm (Enter), cancel (Esc / q)')
@@ -97,6 +103,15 @@ function M.create_dir_popup(dir_path)
     local options = {
         title = ' Mkdir (separate by space) ',
         sh_cmd = 'mkdir'
+    }
+
+    return create_cmd_popup(dir_path, options)
+end
+
+function M.create_rename_popup(dir_path)
+   local options = {
+        title = ' Rename ',
+        sh_cmd = 'mv'
     }
 
     return create_cmd_popup(dir_path, options)

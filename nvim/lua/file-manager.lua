@@ -20,6 +20,11 @@ local function create_event(dir_path, item_name)
     }
 end
 
+local function get_cursor_item(state)
+    local cursor = vim.api.nvim_win_get_cursor(state.win_id)
+    return state.buf_content[cursor[1]]
+end
+
 -- Opens the navigation
 local function open_navigation()
     local state = {
@@ -75,8 +80,7 @@ local function open_navigation()
     end
 
     local function action_on_item(cmd_str)
-        local cursor = vim.api.nvim_win_get_cursor(state.win_id)
-        local item = state.buf_content[cursor[1]]
+        local item = get_cursor_item(state)
 
         if fmGlobals.is_item_directory(item) then
             if cmd_str == cmd.open then
@@ -95,9 +99,7 @@ local function open_navigation()
         end
 
         local function get_current_event()
-            local cursor = vim.api.nvim_win_get_cursor(state.win_id)
-            local item_name = state.buf_content[cursor[1]]
-
+            local item_name = get_cursor_item(state)
             return create_event(state.dir_path, item_name)
         end
 
@@ -201,10 +203,27 @@ local function open_navigation()
             popup.set_keymap('<Cr>', confirm_callback)
         end
 
+        local function create_rename_popup()
+            local popup = fmPopup.create_rename_popup(get_relative_path())
+
+            local function confirm_callback()
+                local output = popup.create_rename_cmd()
+                --local output = vim.fn.systemlist(popup.create_sh_cmd())
+                reload()
+                popup.close_navigation()
+
+                if #output ~= 0 then
+                    fmGlobals.debug(output)
+                    fmPopup.create_info_popup(output, state.win_id, 'Command failed (Esc / q)')
+                end
+            end
+
+            popup.set_keymap('<Cr>', confirm_callback)
+        end
+
         local function delete_item()
             local dir_path = get_relative_path()
-            local cursor = vim.api.nvim_win_get_cursor(state.win_id)
-            local item_name = state.buf_content[cursor[1]]
+            local item_name = get_cursor_item(state)
 
             local function create_sh_cmd()
                 if fmGlobals.is_item_directory(item_name) then

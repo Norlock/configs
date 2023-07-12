@@ -3,18 +3,25 @@ local fmTheming = require("fm-theming")
 
 local M = {}
 
-local function create_simple_state()
-    return {
-        buf_id = vim.api.nvim_create_buf(false, true),
+local function init_popup_module()
+    local buf_id = vim.api.nvim_create_buf(false, true)
+
+    local state = {
+        buf_id = buf_id,
         buf_content = {},
         is_open = false,
+        buffer_options = { silent = true, buffer = buf_id }
     }
+
+    local popup = { state }
+
+    return popup, state
 end
 
-local function create_cmd_popup(dir_path, reload, cmd_options)
-    local state = create_simple_state()
+local function create_cmd_popup(dir_path, cmd_options)
+    local popup, state = init_popup_module()
 
-    local function close_navigation()
+    function popup.close_navigation()
         if state.is_open then
             vim.cmd('stopinsert')
             vim.api.nvim_win_close(state.win_id, false)
@@ -22,7 +29,7 @@ local function create_cmd_popup(dir_path, reload, cmd_options)
         end
     end
 
-    local function execute_create()
+    function popup.create_sh_cmd()
         local user_input = vim.api.nvim_buf_get_lines(state.buf_id, 0, 1, false)
         local parts = fmGlobals.split(user_input[1], " ")
 
@@ -32,15 +39,15 @@ local function create_cmd_popup(dir_path, reload, cmd_options)
             cmd = cmd .. " " .. dir_path .. item
         end
 
-        local output = vim.fn.systemlist(cmd)
+        return cmd
+        --local output = vim.fn.systemlist(cmd)
 
-        reload()
-        close_navigation()
+        --close_navigation()
 
-        if #output ~= 0 then
-            fmGlobals.debug(output)
-            M.create_info_popup(output, state.win_id, 'Command failed (Esc / q)')
-        end
+        --if #output ~= 0 then
+        --fmGlobals.debug(output)
+        --M.create_info_popup(output, related_win_id, 'Command failed (Esc / q)')
+        --end
     end
 
     local function init()
@@ -66,49 +73,46 @@ local function create_cmd_popup(dir_path, reload, cmd_options)
         state.is_open = true;
         fmTheming.add_theming(state)
 
-        local buffer_options = { silent = true, buffer = state.buf_id }
-        vim.keymap.set('i', '<Esc>', close_navigation, buffer_options)
-        vim.keymap.set('i', '<Cr>', execute_create, buffer_options)
+        vim.keymap.set('i', '<Esc>', popup.close_navigation, state.buffer_options)
+        --vim.keymap.set('i', '<Cr>', execute_create, buffer_options)
 
         vim.cmd('startinsert')
     end
 
+    function popup.set_keymap(lhs, rhs)
+        vim.keymap.set('i', lhs, rhs, state.buffer_options)
+    end
+
     init()
-end
 
-function M.create_delete_item_popup(buf_content, parent_win_id)
-    local popup = M.create_info_popup(buf_content, parent_win_id,
-        'Confirm (Enter), cancel (Esc / q)')
-
-    fmGlobals.debug(popup)
     return popup
 end
 
-function M.create_file_popup(dir_path, reload)
+function M.create_delete_item_popup(buf_content, parent_win_id)
+    return M.create_info_popup(buf_content, parent_win_id,
+        'Confirm (Enter), cancel (Esc / q)')
+end
+
+function M.create_file_popup(dir_path)
     local options = {
         title = ' touch ',
         sh_cmd = 'touch'
     }
 
-    create_cmd_popup(dir_path, reload, options)
+    return create_cmd_popup(dir_path, options)
 end
 
-function M.create_dir_popup(dir_path, reload)
+function M.create_dir_popup(dir_path)
     local options = {
         title = ' mkdir ',
         sh_cmd = 'mkdir'
     }
 
-    create_cmd_popup(dir_path, reload, options)
+    return create_cmd_popup(dir_path, options)
 end
 
--- options = {
---    buf_content, parent_win_id, title
--- }
-function M.create_info_popup(buf_content, parent_win_id, title)
-    local popup = {}
-    local state = create_simple_state()
-    popup.state = state
+function M.create_info_popup(buf_content, related_win_id, title)
+    local popup, state = init_popup_module()
 
     function popup.close_navigation()
         if state.is_open then
@@ -128,19 +132,18 @@ function M.create_info_popup(buf_content, parent_win_id, title)
     end
 
     local function init()
-        local win_width = vim.api.nvim_win_get_width(0)
-        local win_height = vim.api.nvim_win_get_height(0)
-        local pos = vim.api.nvim_win_get_position(0)
+        local win_width = vim.api.nvim_win_get_width(related_win_id)
+        local win_height = vim.api.nvim_win_get_height(related_win_id)
         local height = fmGlobals.round(#buf_content)
 
         local win_options = {
             relative = 'win',
-            win = parent_win_id,
+            win = related_win_id,
             width = win_width,
             height = height,
-            row = pos[1] + win_height,
+            row = win_height - height - 1,
             col = -1,
-            anchor = 'SW',
+            anchor = 'NW',
             style = 'minimal',
             border = 'single',
             title = ' ' .. title .. ' ',
@@ -160,11 +163,11 @@ function M.create_info_popup(buf_content, parent_win_id, title)
         fmTheming.add_error_theming(state)
     end
 
-    init()
-
     function popup.set_keymap(lhs, rhs)
         vim.keymap.set('n', lhs, rhs, state.buffer_options)
     end
+
+    init()
 
     return popup
 end

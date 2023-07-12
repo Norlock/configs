@@ -173,11 +173,32 @@ local function open_navigation()
         end
 
         local function create_dir_popup()
-            fmPopup.create_dir_popup(get_relative_path(), reload)
+            local popup = fmPopup.create_dir_popup(get_relative_path())
+
+            local function confirm_callback()
+                local output = vim.fn.systemlist(popup.create_sh_cmd())
+                reload()
+                popup.close_navigation()
+
+                if #output ~= 0 then
+                    fmGlobals.debug(output)
+                    fmPopup.create_info_popup(output, state.win_id, 'Command failed (Esc / q)')
+                end
+            end
+
+            popup.set_keymap('<Cr>', confirm_callback)
         end
 
         local function create_file_popup()
-            fmPopup.create_file_popup(get_relative_path(), reload)
+            local popup = fmPopup.create_file_popup(get_relative_path())
+
+            local function confirm_callback()
+                vim.fn.systemlist(popup.create_sh_cmd())
+                reload()
+                popup.close_navigation()
+            end
+
+            popup.set_keymap('<Cr>', confirm_callback)
         end
 
         local function delete_item()

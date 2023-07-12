@@ -66,22 +66,21 @@ function theming.theme_help_content(state)
         end
     end
 
-    local function hl_slash(line_i, line)
-        fmGlobals.debug("line: " .. line)
-
+    local function hl_slash(line_idx, line)
         local columns = {}
 
+        local slash_byte = string.byte("/")
+
         for i = 1, line:len(), 1 do
-            local char = string.sub(line, i, i)
-            fmGlobals.debug(char)
-            if char == "/" then
+            local char_byte = line:byte(i)
+
+            if slash_byte == char_byte then
                 table.insert(columns, i)
             end
         end
 
         for _, column in ipairs(columns) do
-            fmGlobals.debug("is een slash: " .. column)
-            add_hl('@conditional', line_i, column - 1, column)
+            add_hl('@conditional', line_idx, column - 1, column)
         end
     end
 

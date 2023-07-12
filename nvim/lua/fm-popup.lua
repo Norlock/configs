@@ -201,19 +201,21 @@ function M.create_help_popup(related_win_id)
     local popup, state = mod_builder.info_variant()
 
     local buf_content = {
-        " -- Navigation --",
-        " [h / <Left>]             Navigate to parent",
-        " [l / <Right> / <Cr>]      Navigate to directory or open item",
-        " [q / <Esc>]              Close popup",
+        " -- Navigation",
         " ",
-        " -- Commands --",
-        " [t]                    Open file as tab",
-        " [s]                    Open file as split",
-        " [v]                    Open file as vsplit",
-        " [cf]                   Create file",
-        " [cd]                   Create directory",
-        " [dd]                   Delete item",
-        " [m]                    Move or rename item",
+        " [h / <Left>]              Navigate to parent",
+        " [l / <Right> / <Cr>]      Navigate to directory or open item",
+        " [q / <Esc>]               Close popup",
+        " ",
+        " -- Commands",
+        " ",
+        " [t]                       Open file as tab",
+        " [s]                       Open file as split",
+        " [v]                       Open file as vsplit",
+        " [cf]                      Create file",
+        " [cd]                      Create directory",
+        " [dd]                      Delete item",
+        " [m]                       Move or rename item",
     }
 
     local function init()

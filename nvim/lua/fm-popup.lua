@@ -200,7 +200,21 @@ end
 function M.create_help_popup(related_win_id)
     local popup, state = mod_builder.info_variant()
 
-    local buf_content = { "[?] opens help menu" }
+    local buf_content = {
+        " -- Navigation --",
+        " [h / <Left>]             Navigate to parent",
+        " [l / <Right> / <Cr>]      Navigate to directory or open item",
+        " [q / <Esc>]              Close popup",
+        " ",
+        " -- Commands --",
+        " [t]                    Open file as tab",
+        " [s]                    Open file as split",
+        " [v]                    Open file as vsplit",
+        " [cf]                   Create file",
+        " [cd]                   Create directory",
+        " [dd]                   Delete item",
+        " [m]                    Move or rename item",
+    }
 
     local function init()
         local win_width = vim.api.nvim_win_get_width(related_win_id)
@@ -215,7 +229,8 @@ function M.create_help_popup(related_win_id)
             col = 0,
             anchor = 'NW',
             style = 'minimal',
-            border = 'none',
+            --border = 'solid',
+            --title = "test",
             noautocmd = true,
         }
 
@@ -226,9 +241,11 @@ function M.create_help_popup(related_win_id)
         vim.keymap.set('n', '<Esc>', popup.close_navigation, state.buffer_options)
         vim.keymap.set('n', 'q', popup.close_navigation, state.buffer_options)
 
+        fmTheming.add_help_popup_theming(state)
+
         popup.set_buffer_content(buf_content)
 
-        fmTheming.add_info_popup_theming(state)
+        fmTheming.theme_help_content(state)
     end
 
     init()

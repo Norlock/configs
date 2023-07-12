@@ -29,18 +29,66 @@ function theming.add_info_popup_theming(state)
 end
 
 function theming.add_help_popup_theming(state)
-    -- TODO
-    vim.api.nvim_set_hl(theming.popup_ns_id, 'NormalFloat', {})
-
-    vim.api.nvim_win_set_hl_ns(state.win_id, theming.popup_ns_id)
+    vim.api.nvim_set_hl(theming.help_ns_id, 'NormalFloat', {})
+    vim.api.nvim_win_set_hl_ns(state.win_id, theming.help_ns_id)
 end
 
 function theming.theme_buffer_content(state)
-    vim.api.nvim_buf_clear_namespace(state.buf_id, -1, 1, -1)
     for i, buf_dir_name in ipairs(state.buf_content) do
         if fmGlobals.is_item_directory(buf_dir_name) then
             vim.api.nvim_buf_add_highlight(state.buf_id, theming.ns_id, "Directory", i - 1, 0, -1)
         end
+    end
+end
+
+function theming.theme_help_content(state)
+    local function add_hl(hl_group, i, col_start, col_end)
+        vim.api.nvim_buf_add_highlight(
+            state.buf_id, theming.help_ns_id, hl_group, i - 1, col_start, col_end
+        )
+    end
+
+    local function hl_comment(i, line)
+        local trim = fmGlobals.trim(line)
+        if string.sub(trim, 1, 2) == "--" then
+            add_hl('Title', i, 0, -1)
+        end
+    end
+
+    local function hl_keymap(i, line)
+        fmGlobals.debug("line: " .. line)
+        local start_column = line:find('%[')
+        local end_column = line:find('%]')
+
+        if start_column ~= nil and end_column ~= nil then
+            fmGlobals.debug("is een keymap: " .. start_column .. " " .. end_column)
+            add_hl('SpecialChar', i, start_column, end_column - 1)
+        end
+    end
+
+    local function hl_slash(line_i, line)
+        fmGlobals.debug("line: " .. line)
+
+        local columns = {}
+
+        for i = 1, line:len(), 1 do
+            local char = string.sub(line, i, i)
+            fmGlobals.debug(char)
+            if char == "/" then
+                table.insert(columns, i)
+            end
+        end
+
+        for _, column in ipairs(columns) do
+            fmGlobals.debug("is een slash: " .. column)
+            add_hl('@conditional', line_i, column - 1, column)
+        end
+    end
+
+    for i, line in ipairs(state.buf_content) do
+        hl_comment(i, line)
+        hl_keymap(i, line)
+        hl_slash(i, line)
     end
 end
 

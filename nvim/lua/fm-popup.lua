@@ -40,14 +40,6 @@ local function create_cmd_popup(dir_path, cmd_options)
         end
 
         return cmd
-        --local output = vim.fn.systemlist(cmd)
-
-        --close_navigation()
-
-        --if #output ~= 0 then
-        --fmGlobals.debug(output)
-        --M.create_info_popup(output, related_win_id, 'Command failed (Esc / q)')
-        --end
     end
 
     local function init()
@@ -65,7 +57,7 @@ local function create_cmd_popup(dir_path, cmd_options)
             style = 'minimal',
             border = 'rounded',
             title = cmd_options.title,
-            title_pos = 'center',
+            title_pos = 'left',
             noautocmd = true,
         }
 
@@ -74,7 +66,6 @@ local function create_cmd_popup(dir_path, cmd_options)
         fmTheming.add_theming(state)
 
         vim.keymap.set('i', '<Esc>', popup.close_navigation, state.buffer_options)
-        --vim.keymap.set('i', '<Cr>', execute_create, buffer_options)
 
         vim.cmd('startinsert')
     end
@@ -95,7 +86,7 @@ end
 
 function M.create_file_popup(dir_path)
     local options = {
-        title = ' touch ',
+        title = ' Touch (separate by space) ',
         sh_cmd = 'touch'
     }
 
@@ -104,7 +95,7 @@ end
 
 function M.create_dir_popup(dir_path)
     local options = {
-        title = ' mkdir ',
+        title = ' Mkdir (separate by space) ',
         sh_cmd = 'mkdir'
     }
 

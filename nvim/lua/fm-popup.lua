@@ -222,10 +222,11 @@ function M.create_help_popup(related_win_id)
         " [t]                       Open file as tab",
         " [s]                       Open file as split",
         " [v]                       Open file as vsplit",
-        " [cf]                      Create file",
-        " [cd]                      Create directory",
+        " [=]                       Open terminal in tab",
+        " [cf]                      Create file (e.g.: test.lua test2.lua)",
+        " [cd]                      Create directory (e.g.: css js public",
         " [dd]                      Delete item",
-        " [m]                       Move or rename item",
+        " [m]                       Move or rename item (e.g.: .. will move to parent)",
     }
 
     local function init()

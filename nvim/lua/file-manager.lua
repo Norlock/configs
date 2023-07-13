@@ -52,7 +52,7 @@ function M.open_navigation()
 
     vim.api.nvim_create_autocmd("BufWinLeave", {
         buffer = state.buf_id,
-        callback = function ()
+        callback = function()
             state.is_open = false
             vim.api.nvim_win_close(state.win_id, false)
         end
@@ -114,6 +114,20 @@ function M.open_navigation()
             close_navigation()
             vim.cmd(cmd_str .. ' ' .. file_rel)
         end
+    end
+
+    local function get_relative_path()
+        return path:new(state.dir_path):make_relative() .. "/"
+    end
+
+
+    local function open_terminal()
+        local dir_path = get_relative_path()
+
+        local sh_cmd = ":terminal"
+        vim.cmd("tabe")
+        vim.cmd(sh_cmd .. " cd ".. dir_path .. " && $SHELL")
+        vim.cmd("startinsert")
     end
 
     local function navigate_to_parent()
@@ -192,10 +206,6 @@ function M.open_navigation()
         fmTheming.add_theming(state)
 
         local buffer_options = { silent = true, buffer = state.buf_id }
-
-        local function get_relative_path()
-            return path:new(state.dir_path):make_relative() .. "/"
-        end
 
         local function confirm_new_item_callback(popup, sh_cmd)
             local output = vim.fn.systemlist(popup.create_sh_cmd(sh_cmd))
@@ -276,6 +286,7 @@ function M.open_navigation()
         vim.keymap.set('n', 'v', function() action_on_item(cmd.vSplit) end, buffer_options)
         vim.keymap.set('n', 's', function() action_on_item(cmd.hSplit) end, buffer_options)
         vim.keymap.set('n', 't', function() action_on_item(cmd.openTab) end, buffer_options)
+        vim.keymap.set('n', '=', open_terminal, buffer_options)
         vim.keymap.set('n', 'cd', create_dir_popup, buffer_options)
         vim.keymap.set('n', 'cf', create_file_popup, buffer_options)
         vim.keymap.set('n', 'm', create_move_popup, buffer_options)

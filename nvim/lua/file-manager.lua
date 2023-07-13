@@ -50,6 +50,14 @@ function M.open_navigation()
 
     local state = M.create_new_state();
 
+    vim.api.nvim_create_autocmd("BufWinLeave", {
+        buffer = state.buf_id,
+        callback = function ()
+            state.is_open = false
+            vim.api.nvim_win_close(state.win_id, false)
+        end
+    })
+
     local cmd = {
         open = 'e',
         openTab = 'tabe',
@@ -60,7 +68,7 @@ function M.open_navigation()
     local function close_navigation()
         if state.is_open then
             vim.api.nvim_win_close(state.win_id, false)
-            state.is_open = false
+            --state.is_open = false
         end
     end
 

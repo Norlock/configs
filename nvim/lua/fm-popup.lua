@@ -20,11 +20,16 @@ local function popup_module_builder()
     local function create_info_variant()
         local popup, state = create_module()
 
-        function popup.close_navigation()
-            if state.is_open then
-                vim.api.nvim_win_close(state.win_id, false)
+        vim.api.nvim_create_autocmd({"BufWinLeave", "BufLeave", "BufHidden"}, {
+            buffer = state.buf_id,
+            callback = function ()
                 state.is_open = false
+                vim.api.nvim_win_close(state.win_id, false)
             end
+        })
+
+        function popup.close_navigation()
+            vim.api.nvim_win_close(state.win_id, false)
         end
 
         function popup.set_buffer_content(buf_content)
@@ -41,12 +46,17 @@ local function popup_module_builder()
     local function create_cmd_variant()
         local popup, state = create_module()
 
-        function popup.close_navigation()
-            if state.is_open then
+        vim.api.nvim_create_autocmd({"BufWinLeave", "BufLeave", "BufHidden"}, {
+            buffer = state.buf_id,
+            callback = function ()
+                state.is_open = false
                 vim.cmd('stopinsert')
                 vim.api.nvim_win_close(state.win_id, false)
-                state.is_open = false
             end
+        })
+
+        function popup.close_navigation()
+            vim.api.nvim_win_close(state.win_id, false)
         end
 
         return popup, state

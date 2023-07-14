@@ -8,7 +8,12 @@ return require('packer').startup(function(use)
     use {
         'nvim-telescope/telescope.nvim', tag = '0.1.2', requires = { { 'nvim-lua/plenary.nvim' } }
     }
-    use 'justinmk/vim-dirvish'
+    --use 'justinmk/vim-dirvish'
+    use '~/Projects/nvim-traveller'
+    --use {
+        --'norlock/nvim-traveller',
+        --requires = { { 'nvim-lua/plenary.nvim' } }
+    --}
 
     -- Themes
     use 'neanias/everforest-nvim'

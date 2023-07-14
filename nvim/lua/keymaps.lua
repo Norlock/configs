@@ -70,3 +70,8 @@ vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
 vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, {})
+
+-- Filemanager
+local traveller = require('nvim-traveller')
+
+vim.keymap.set('n', '<leader>o', traveller.open_navigation, {})

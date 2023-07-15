@@ -11,9 +11,13 @@ return require('packer').startup(function(use)
     --use 'justinmk/vim-dirvish'
     use '~/Projects/nvim-traveller'
     --use {
-        --'norlock/nvim-traveller',
-        --requires = { { 'nvim-lua/plenary.nvim' } }
+    --'norlock/nvim-traveller',
+    --requires = { { 'nvim-lua/plenary.nvim' } }
     --}
+    use {
+        "nvim-telescope/telescope-file-browser.nvim",
+        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+    }
 
     -- Themes
     use 'neanias/everforest-nvim'

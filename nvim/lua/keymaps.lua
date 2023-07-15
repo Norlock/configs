@@ -66,12 +66,20 @@ vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
 vim.keymap.set('n', '<leader>d', vim.lsp.buf.format, {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
 vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
+
+vim.keymap.set('n', 'gd', builtin.lsp_definitions, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
-vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
-vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, {})
+vim.keymap.set('n', 'gr', builtin.lsp_references, {})
 
 -- Filemanager
 local traveller = require('nvim-traveller')
+traveller.setup({ replace_netrw = true })
 
 vim.keymap.set('n', '<leader>o', traveller.open_navigation, {})
+
+vim.api.nvim_set_keymap(
+  "n",
+  "-",
+  ":Telescope file_browser<CR>",
+  { noremap = true, silent=true }
+)

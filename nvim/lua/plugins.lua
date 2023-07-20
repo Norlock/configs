@@ -1,45 +1,63 @@
-return require('packer').startup(function(use)
-    -- Packer can manage itself
-    use 'wbthomason/packer.nvim'
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+    vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        "--branch=stable", -- latest stable release
+        lazypath,
+    })
+end
+vim.opt.rtp:prepend(lazypath)
 
-    use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdateSync' }
+require("lazy").setup({
+    'nvim-lua/plenary.nvim',
+    { 'nvim-treesitter/nvim-treesitter', cmd = 'TSUpdateSync' },
+    { 'nvim-telescope/telescope.nvim',   tag = '0.1.2' },
+    {
+        dir = '~/Projects/nvim-traveller',
+        init = function()
+            vim.o.formatoptions = "tq"
+        end
+    },
+    { "rebelot/kanagawa.nvim",       lazy = true },
+    { "morhetz/gruvbox",             lazy = true },
+    { "nvim-tree/nvim-web-devicons", lazy = true },
+    'nvim-lualine/lualine.nvim',
+    'xiyaowong/transparent.nvim',
+    { "catppuccin/nvim", as = "catppuccin", lazy = true },
 
-    -- Navigation
-    use {
-        'nvim-telescope/telescope.nvim', tag = '0.1.2', requires = { { 'nvim-lua/plenary.nvim' } }
-    }
-    --use 'justinmk/vim-dirvish'
-    use '~/Projects/nvim-traveller'
-    --use {
-    --'norlock/nvim-traveller',
-    --requires = { { 'nvim-lua/plenary.nvim' } }
-    --}
-    use {
-        "nvim-telescope/telescope-file-browser.nvim",
-        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
-    }
+    {
+        'neanias/everforest-nvim',
+        lazy = false,    -- make sure we load this during startup if it is your main colorscheme
+        priority = 1000, -- make sure to load this before all the other start plugins
+        config = function()
+            -- load the colorscheme here
+            vim.cmd([[colorscheme everforest]])
+        end,
+    },
 
+    'neovim/nvim-lspconfig',
+    'hrsh7th/cmp-nvim-lsp',
+    'hrsh7th/cmp-nvim-lsp-signature-help',
+    'hrsh7th/cmp-buffer',
+    'hrsh7th/cmp-path',
+    'hrsh7th/cmp-cmdline',
+    'hrsh7th/nvim-cmp',
     -- Themes
-    use 'neanias/everforest-nvim'
-    use "rebelot/kanagawa.nvim"
-    use "morhetz/gruvbox"
-    use 'nvim-tree/nvim-web-devicons'
-    use 'nvim-lualine/lualine.nvim'
-    use 'xiyaowong/transparent.nvim'
-
     -- LSP
-    use 'neovim/nvim-lspconfig'
-    use 'hrsh7th/cmp-nvim-lsp'
-    use 'hrsh7th/cmp-nvim-lsp-signature-help'
-    use 'hrsh7th/cmp-buffer'
-    use 'hrsh7th/cmp-path'
-    use 'hrsh7th/cmp-cmdline'
-    use 'hrsh7th/nvim-cmp'
 
     -- For luasnip users.
-    use 'L3MON4D3/LuaSnip'
-    use 'saadparwaiz1/cmp_luasnip'
+    'L3MON4D3/LuaSnip',
+    'saadparwaiz1/cmp_luasnip',
 
     -- Comments
-    use 'preservim/nerdcommenter'
-end)
+    'preservim/nerdcommenter',
+})
+
+        vim.api.nvim_create_autocmd("BufEnter", {
+            callback = function ()
+                vim.o.formatoptions = "tq"
+            end
+        })

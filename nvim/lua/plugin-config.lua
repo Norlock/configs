@@ -93,8 +93,9 @@ require('lspconfig').lua_ls.setup {
 
 -- Telescope
 local actions = require("telescope.actions")
+local telescope = require("telescope")
 
-require("telescope").setup({
+telescope.setup({
     defaults = {
         previewer = true,
         mappings = {
@@ -105,7 +106,9 @@ require("telescope").setup({
     },
 })
 
-require("telescope").load_extension("file_browser")
+-- To get fzf loaded and working with telescope, you need to call
+-- load_extension, somewhere after setup function:
+--telescope.load_extension('fzf')
 
 -- Lualine
 require('lualine').setup {

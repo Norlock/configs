@@ -13,3 +13,4 @@ vim.o.splitbelow = true -- Splits pane below
 vim.o.swapfile = false
 vim.o.scrolloff = 3
 vim.o.textwidth = 80
+vim.o.formatoptions = "tq"

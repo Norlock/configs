@@ -4,9 +4,14 @@ vim.o.termguicolors = true
 vim.o.cursorline = true
 vim.o.background = 'dark'
 
-vim.cmd.colorscheme("everforest")
+--vim.cmd.colorscheme("everforest")
 --vim.cmd.colorscheme("kanagawa")
 --vim.cmd.colorscheme("gruvbox")
+
+--require("catppuccin").setup({
+    --flavour = "mocha" -- latte, frappe, macchiato, mocha
+--})
+--vim.cmd.colorscheme("catppuccin")
 
 --require("transparent").setup({
   --groups = { -- table: default groups

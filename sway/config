@@ -15,18 +15,12 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term kitty
+set $term foot
 # Your preferred application launcher
-set $menu bemenu-run -m 1 --fn "Fira Mono for Powerline 16" -l 8
+set $menu bemenu-run -m 1 --fn "FiraCodeNerdFontMono 20" -l 8
 
 ### Output configuration
-#
-output DP-3 resolution 2560x1440@144.000000Hz pos 0,0
-output HDMI-A-1 resolution 2560x1440 pos 2560,350
-
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output DP-3 bg ~/Projects/configs/images/wallpapers/ban-cover.jpg fit #000000
-output HDMI-A-1 bg ~/Projects/configs/images/wallpapers/disharmonium.jpg fit #000000
+output * bg ~/Projects/configs/images/coral.jpg fill #000000
 #
 # Example configuration:
 #
@@ -54,11 +48,14 @@ output HDMI-A-1 bg ~/Projects/configs/images/wallpapers/disharmonium.jpg fit #00
 
 bindsym $mod+n exec wlsunset
 
+# start a terminal with neovim
+bindsym $mod+Return exec $term nvim
+
 # start a terminal
-bindsym $mod+Return exec $term
+bindsym $mod+Shift+Return exec $term
 
 # kill focused window
-bindsym $mod+Shift+q kill
+bindsym $mod+q kill
 
 # start your launcher
 bindsym $mod+d exec $menu
@@ -77,7 +74,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+e exit
 
 # browser
-bindsym $mod+p exec brave
+bindsym $mod+p exec firefox-developer-edition
 bindsym $mod+c exec telegram-desktop
 
 # Lock screen
@@ -258,7 +255,7 @@ bindsym XF86AudioMute exec pamixer -t
 bindsym XF86MonBrightnessDown exec brightnessctl s 10%-
 bindsym XF86MonBrightnessUp exec brightnessctl s +10%
 
-gaps outer 10
+gaps outer 5
 gaps inner 10
 
 include /etc/sway/config.d/*

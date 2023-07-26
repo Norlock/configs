@@ -9,18 +9,18 @@ local cmp_mappings = cmp.mapping.preset.insert({
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     --["<Tab>"] = cmp.mapping(function(fallback)
-        --if luasnip.expand_or_jumpable() then
-            --luasnip.expand_or_jump()
-        --else
-            --fallback()
-        --end
+    --if luasnip.expand_or_jumpable() then
+    --luasnip.expand_or_jump()
+    --else
+    --fallback()
+    --end
     --end, { "i", "s" }),
     --["<S-Tab>"] = cmp.mapping(function(fallback)
-        --if luasnip.jumpable(-1) then
-            --luasnip.jump(-1)
-        --else
-            --fallback()
-        --end
+    --if luasnip.jumpable(-1) then
+    --luasnip.jump(-1)
+    --else
+    --fallback()
+    --end
     --end, { "i", "s" }),
 })
 
@@ -112,42 +112,45 @@ telescope.setup({
 
 -- Lualine
 require('lualine').setup {
-  options = {
-    icons_enabled = true,
-    theme = 'auto',
-    component_separators = { left = '|', right = '|'},
-    section_separators = { left = '', right = ''},
-    disabled_filetypes = {
-      statusline = {},
-      winbar = {},
+    options = {
+        icons_enabled = true,
+        theme = 'auto',
+        component_separators = { left = '|', right = '|' },
+        section_separators = { left = '', right = '' },
+        disabled_filetypes = {
+            statusline = {},
+            winbar = {},
+        },
+        ignore_focus = {},
+        always_divide_middle = true,
+        globalstatus = false,
+        refresh = {
+            statusline = 1000,
+            tabline = 1000,
+            winbar = 1000,
+        }
     },
-    ignore_focus = {},
-    always_divide_middle = true,
-    globalstatus = false,
-    refresh = {
-      statusline = 1000,
-      tabline = 1000,
-      winbar = 1000,
-    }
-  },
-  sections = {
-    lualine_a = {'mode'},
-    lualine_b = {'branch'},
-    lualine_c = {'filename'},
-    lualine_x = {'filetype'},
-    lualine_y = {'progress'},
-    lualine_z = {'location'}
-  },
-  inactive_sections = {
-    lualine_a = {},
-    lualine_b = {},
-    lualine_c = {'filename'},
-    lualine_x = {'location'},
-    lualine_y = {},
-    lualine_z = {}
-  },
-  tabline = {},
-  winbar = {},
-  inactive_winbar = {},
-  extensions = {}
+    sections = {
+        lualine_a = { 'mode' },
+        lualine_b = { 'branch' },
+        lualine_c = { 'filename' },
+        lualine_x = { 'filetype' },
+        lualine_y = { 'progress' },
+        lualine_z = { 'location' }
+    },
+    inactive_sections = {
+        lualine_a = {},
+        lualine_b = {},
+        lualine_c = { 'filename' },
+        lualine_x = { 'location' },
+        lualine_y = {},
+        lualine_z = {}
+    },
+    tabline = {},
+    winbar = {},
+    inactive_winbar = {},
+    extensions = {}
 }
+
+require("project_nvim").setup {}
+require('telescope').load_extension('projects')

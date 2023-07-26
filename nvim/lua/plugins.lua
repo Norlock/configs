@@ -12,6 +12,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+    -- workflow
     'nvim-lua/plenary.nvim',
     { 'nvim-treesitter/nvim-treesitter', cmd = 'TSUpdateSync' },
     { 'nvim-telescope/telescope.nvim',   tag = '0.1.2' },
@@ -21,6 +22,9 @@ require("lazy").setup({
             vim.o.formatoptions = "tq"
         end
     },
+    'ThePrimeagen/harpoon',
+
+    -- Themes
     { "rebelot/kanagawa.nvim",       lazy = true },
     { "morhetz/gruvbox",             lazy = true },
     { "nvim-tree/nvim-web-devicons", lazy = true },
@@ -38,6 +42,7 @@ require("lazy").setup({
         end,
     },
 
+    -- LSP
     'neovim/nvim-lspconfig',
     'hrsh7th/cmp-nvim-lsp',
     'hrsh7th/cmp-nvim-lsp-signature-help',
@@ -45,19 +50,18 @@ require("lazy").setup({
     'hrsh7th/cmp-path',
     'hrsh7th/cmp-cmdline',
     'hrsh7th/nvim-cmp',
-    -- Themes
-    -- LSP
 
     -- For luasnip users.
     'L3MON4D3/LuaSnip',
     'saadparwaiz1/cmp_luasnip',
+    "ahmedkhalf/project.nvim",
 
     -- Comments
     'preservim/nerdcommenter',
 })
 
-        vim.api.nvim_create_autocmd("BufEnter", {
-            callback = function ()
-                vim.o.formatoptions = "tq"
-            end
-        })
+vim.api.nvim_create_autocmd("BufEnter", {
+    callback = function()
+        vim.o.formatoptions = "tq"
+    end
+})

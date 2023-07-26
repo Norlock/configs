@@ -1,7 +1,7 @@
 * {
     border: none;
     border-radius: 2px;
-    font-family: Ubuntu Mono derivative Powerline, Helvetica, Arial, sans-serif;
+    font-family: FiraCodeNerdFontMono, Helvetica, Arial, sans-serif;
     font-size: 18px;
     min-height: 0;
 }
@@ -13,11 +13,12 @@ window#waybar {
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 #workspaces button {
     padding: 6px 6px;
+    margin-left: 5px;
     background: transparent;
     color: #e6e1cf;
 }
 
-#workspaces button.active {
+#workspaces button.focused {
     background: #323232;
 }
 

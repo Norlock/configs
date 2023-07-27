@@ -6,7 +6,7 @@ local cmp_mappings = cmp.mapping.preset.insert({
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     --["<Tab>"] = cmp.mapping(function(fallback)
     --if luasnip.expand_or_jumpable() then
     --luasnip.expand_or_jump()
@@ -38,7 +38,6 @@ cmp.setup({
         { name = 'nvim_lsp' },
         { name = 'nvim_lsp_signature_help' },
         { name = 'luasnip' },
-    }, {
         { name = 'buffer' },
     })
 })

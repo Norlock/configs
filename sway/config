@@ -46,7 +46,7 @@ output * bg ~/Projects/configs/images/coral.jpg fill #000000
 # Basics:
 #
 
-bindsym $mod+n exec wlsunset
+exec_always wlsunset -l 52 -L 6.8
 
 # start a terminal with neovim
 bindsym $mod+Return exec $term nvim
@@ -217,7 +217,7 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 # Window borders
-default_border pixel 3
+default_border pixel 2
 
 # Colors
 set $black			#000000

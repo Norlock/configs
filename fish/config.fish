@@ -24,11 +24,10 @@ alias fishConfig="nvim ~/.config/fish/config.fish"
 alias fishReload="source ~/.config/fish/config.fish"
 
 # Because I'm lazy
-alias r="ranger"
 alias n="nvim"
 alias nvimConfig="nvim ~/.config/nvim/init.vim"
 alias swayConfig="nvim ~/.config/sway/config"
-alias alacrittyConfig="nvim ~/.config/alacritty/alacritty.yml"
+alias alacrittyConfig="nvim ~/.config/foot/foot.ini"
 alias kittyConfig="nvim ~/.config/kitty/kitty.conf"
 alias ...="cd ../.."
 alias ....="cd ../../.."

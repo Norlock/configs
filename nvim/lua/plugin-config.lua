@@ -1,5 +1,4 @@
 -- Set up nvim-cmp
-local luasnip = require("luasnip")
 local cmp = require("cmp")
 
 local cmp_mappings = cmp.mapping.preset.insert({
@@ -152,5 +151,21 @@ require('lualine').setup {
     extensions = {}
 }
 
-require("project_nvim").setup {}
-require('telescope').load_extension('projects')
+--require("project_nvim").setup {}
+--require('telescope').load_extension('projects')
+
+require('nvim-treesitter.configs').setup {
+    -- A list of parser names, or "all" (the five listed parsers should always be installed)
+    ensure_installed = { "rust", "lua", "vim", "vimdoc", "wgsl" },
+
+    -- Install parsers synchronously (only applied to `ensure_installed`)
+    sync_install = false,
+
+    -- Automatically install missing parsers when entering buffer
+    -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+    auto_install = true,
+
+    highlight = {
+        enable = true
+    },
+}

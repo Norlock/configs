@@ -14,6 +14,8 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     -- workflow
     'nvim-lua/plenary.nvim',
+    'ThePrimeagen/harpoon',
+
     { 'nvim-treesitter/nvim-treesitter', cmd = 'TSUpdateSync' },
     { 'nvim-telescope/telescope.nvim',   tag = '0.1.2' },
     {
@@ -22,14 +24,15 @@ require("lazy").setup({
             vim.o.formatoptions = "tq"
         end
     },
-    'ThePrimeagen/harpoon',
 
     -- Themes
     { "rebelot/kanagawa.nvim",       lazy = true },
     { "morhetz/gruvbox",             lazy = true },
     { "nvim-tree/nvim-web-devicons", lazy = true },
+
     'nvim-lualine/lualine.nvim',
     'xiyaowong/transparent.nvim',
+
     {
         "catppuccin/nvim",
         as = "catppuccin",
@@ -37,7 +40,7 @@ require("lazy").setup({
         priority = 1000,
         config = function()
             require("catppuccin").setup({
-                flavour = "mocha" -- latte, frappe, macchiato, mocha
+                flavour = "frappe" -- latte, frappe, macchiato, mocha
             })
 
             vim.cmd.colorscheme("catppuccin")

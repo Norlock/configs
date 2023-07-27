@@ -90,6 +90,12 @@ require('lspconfig').lua_ls.setup {
     },
 }
 
+vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function()
+        vim.lsp.buf.format { async = false }
+    end
+})
+
 -- Telescope
 local actions = require("telescope.actions")
 local telescope = require("telescope")
@@ -104,10 +110,6 @@ telescope.setup({
         },
     },
 })
-
--- To get fzf loaded and working with telescope, you need to call
--- load_extension, somewhere after setup function:
---telescope.load_extension('fzf')
 
 -- Lualine
 require('lualine').setup {
@@ -151,9 +153,6 @@ require('lualine').setup {
     extensions = {}
 }
 
---require("project_nvim").setup {}
---require('telescope').load_extension('projects')
-
 require('nvim-treesitter.configs').setup {
     -- A list of parser names, or "all" (the five listed parsers should always be installed)
     ensure_installed = { "rust", "lua", "vim", "vimdoc", "wgsl" },
@@ -169,3 +168,7 @@ require('nvim-treesitter.configs').setup {
         enable = true
     },
 }
+
+-- Traveller
+local traveller = require('nvim-traveller')
+traveller.setup({ replace_netrw = true, sync_cwd = true, show_hidden = false })

@@ -72,13 +72,12 @@ vim.keymap.set('t', '<leader>e', exit_term, silent_options)
 
 -- Telescope
 local builtin = require('telescope.builtin')
-
 vim.keymap.set('n', '<leader>g', builtin.git_files, {})
 vim.keymap.set('n', '<leader>f', builtin.find_files, {})
 vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
 vim.keymap.set('n', '<leader>b', builtin.buffers, {}) -- replacing with harpoon
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
-vim.keymap.set('n', '<space>f', vim.lsp.buf.format, {})
+--vim.keymap.set('n', '<space>f', vim.lsp.buf.format, {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
 vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})
 
@@ -88,8 +87,6 @@ vim.keymap.set('n', 'gr', builtin.lsp_references, {})
 
 -- Filemanager
 local traveller = require('nvim-traveller')
-traveller.setup({ replace_netrw = true, sync_cwd = true, show_hidden = false })
-
 vim.keymap.set('n', '-', traveller.open_navigation, {})
 vim.keymap.set('n', '<leader>d', traveller.open_telescope_search, silent_options)
 vim.keymap.set('n', '<leader>o', traveller.open_terminal, silent_options)

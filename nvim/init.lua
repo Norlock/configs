@@ -14,6 +14,7 @@ vim.o.swapfile = false
 vim.o.scrolloff = 3
 vim.o.textwidth = 100
 vim.o.formatoptions = "tq"
+vim.o.smartcase = true
 
 -- Show diagnostics in a pop-up window on hover
 _G.LspDiagnosticsPopupHandler = function()
@@ -36,10 +37,10 @@ augroup END
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
-        virtual_text = false,
+        virtual_text = true,
         underline = false,
         signs = true,
     }
 )
 
-vim.filetype.add({extension = {wgsl = "wgsl"}})
+vim.filetype.add({ extension = { wgsl = "wgsl" } })

@@ -20,6 +20,7 @@ set $term foot
 set $menu bemenu-run -m 1 --fn "FiraCodeNerdFontMono 20" -l 8
 
 ### Output configuration
+output * mode 1920x1080
 output * bg ~/Projects/configs/images/coral.jpg fill #000000
 #
 # Example configuration:
@@ -46,7 +47,7 @@ output * bg ~/Projects/configs/images/coral.jpg fill #000000
 # Basics:
 #
 
-exec_always wlsunset -l 52 -L 6.8
+# exec_always wlsunset -l 52 -L 6.8
 
 # start a terminal with neovim
 bindsym $mod+Return exec $term nvim

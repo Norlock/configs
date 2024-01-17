@@ -20,11 +20,14 @@ set $term foot
 set $menu bemenu-run -m 1 --fn "FiraCodeNerdFontMono 20" -l 8
 
 ### Output configuration
-output * mode 1920x1080
 output * bg ~/Projects/configs/images/coral.jpg fill #000000
-#
+
+output DP-1 position 3840,0
+
+
 # Example configuration:
 #
+#   output HDMI-A-1 resolution 1920x1080 position 1920,0
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
@@ -47,7 +50,7 @@ output * bg ~/Projects/configs/images/coral.jpg fill #000000
 # Basics:
 #
 
-# exec_always wlsunset -l 52 -L 6.8
+exec_always wlsunset -l 52 -L 6.8
 
 # start a terminal with neovim
 bindsym $mod+Return exec $term nvim
@@ -60,6 +63,10 @@ bindsym $mod+q kill
 
 # start your launcher
 bindsym $mod+d exec $menu
+
+bindsym $mod+m exec makoctl dismiss -a
+
+bindsym Print exec screenshot
 
 # Drag floating windows by holding down $mod and left mouse button.
 # Resize them with right mouse button + $mod.
@@ -75,7 +82,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+e exit
 
 # browser
-bindsym $mod+p exec firefox-developer-edition
+bindsym $mod+p exec brave
 bindsym $mod+c exec telegram-desktop
 
 # Lock screen
@@ -109,6 +116,7 @@ bindsym $mod+Shift+Right move right
 # next or previous workspace
 bindsym $mod+comma workspace prev
 bindsym $mod+period workspace next
+
 #
 # Workspaces:
 #

@@ -14,24 +14,33 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     -- workflow
     'nvim-lua/plenary.nvim',
-    'ThePrimeagen/harpoon',
 
-    { 'nvim-treesitter/nvim-treesitter', cmd = 'TSUpdateSync' },
-    { 'nvim-telescope/telescope.nvim',   tag = '0.1.2' },
+    { 'nvim-telescope/telescope.nvim', tag = '0.1.5' },
+    {
+        dir = '~/Projects/telescope.nvim'
+    },
     {
         dir = '~/Projects/nvim-traveller',
         init = function()
             vim.o.formatoptions = "tq"
         end
     },
+    {
+        dir = '~/Projects/nvim-traveller-buffers',
+    },
+    --'norlock/nvim-traveller-buffers',
+    {
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        opts = {} -- this is equalent to setup({}) function
+    },
 
     -- Themes
-    { "rebelot/kanagawa.nvim",       lazy = true },
-    { "morhetz/gruvbox",             lazy = true },
-    { "nvim-tree/nvim-web-devicons", lazy = true },
+    { "rebelot/kanagawa.nvim",         lazy = true },
+    { "morhetz/gruvbox",               lazy = true },
+    { "nvim-tree/nvim-web-devicons",   lazy = true },
 
     'nvim-lualine/lualine.nvim',
-    'xiyaowong/transparent.nvim',
 
     {
         "catppuccin/nvim",
@@ -47,16 +56,8 @@ require("lazy").setup({
         end
     },
 
-    --{
-    --'neanias/everforest-nvim',
-    --lazy = false,    -- make sure we load this during startup if it is your main colorscheme
-    --priority = 1000, -- make sure to load this before all the other start plugins
-    --config = function()
-    ---- load the colorscheme here
-    --end,
-    --},
-
     -- LSP
+    "williamboman/mason.nvim",
     'neovim/nvim-lspconfig',
     'hrsh7th/cmp-nvim-lsp',
     'hrsh7th/cmp-nvim-lsp-signature-help',
@@ -66,9 +67,14 @@ require("lazy").setup({
     'hrsh7th/nvim-cmp',
 
     -- For luasnip users.
-    'L3MON4D3/LuaSnip',
+    {
+        "L3MON4D3/LuaSnip",
+        -- follow latest release.
+        version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+        -- install jsregexp (optional!).
+        build = "make install_jsregexp"
+    },
     'saadparwaiz1/cmp_luasnip',
-    "ahmedkhalf/project.nvim",
 
     -- Comments
     'preservim/nerdcommenter',

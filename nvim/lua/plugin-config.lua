@@ -30,8 +30,8 @@ cmp.setup({
         end,
     },
     window = {
-        -- completion = cmp.config.window.bordered(),
-        -- documentation = cmp.config.window.bordered(),
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
     },
     mapping = cmp_mappings,
     sources = cmp.config.sources({
@@ -69,17 +69,8 @@ cmp.setup.cmdline(':', {
     })
 })
 
--- Set up lspconfig.
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
--- Rust
-require('lspconfig').rust_analyzer.setup {
-    capabilities = capabilities,
-}
-
 -- Lua
 require('lspconfig').lua_ls.setup {
-    capabilities = capabilities,
     settings = {
         Lua = {
             diagnostics = {
@@ -88,6 +79,30 @@ require('lspconfig').lua_ls.setup {
         },
     },
 }
+
+require('lspconfig').rust_analyzer.setup {}
+require('lspconfig').wgsl_analyzer.setup {}
+require('lspconfig').tsserver.setup {}
+require('lspconfig').html.setup {}
+require('lspconfig').cssls.setup {}
+require('lspconfig').jsonls.setup {}
+require('lspconfig').gopls.setup {}
+require('lspconfig').taplo.setup {}
+require('lspconfig').svelte.setup {}
+require('lspconfig').yamlls.setup {
+    settings = {
+        yaml = {
+            format = {
+                enable = true,
+                singleQuote = false,
+                bracketSpacing = true
+            },
+        }
+    }
+}
+
+
+require("mason").setup()
 
 vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function()
@@ -116,7 +131,7 @@ require('lualine').setup {
         icons_enabled = true,
         theme = 'auto',
         component_separators = { left = '|', right = '|' },
-        section_separators = { left = '', right = '' },
+        section_separators = { left = '', right = '' },
         disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -167,7 +182,3 @@ require('nvim-treesitter.configs').setup {
         enable = true
     },
 }
-
--- Traveller
-local traveller = require('nvim-traveller')
-traveller.setup({ replace_netrw = true, sync_cwd = true, show_hidden = false })

@@ -7,13 +7,6 @@ vim.keymap.set('n', '<C-s>', ':w<Cr>', silent_options)
 vim.keymap.set('n', '_', ':move -2<Cr>', silent_options)
 vim.keymap.set('n', '+', ':move +1<Cr>', silent_options)
 
-local reload_modules = function()
-    local plenary = require("plenary.reload")
-    plenary.reload_module("nvim-traveller")
-end
-
-vim.keymap.set('n', '<leader>-', reload_modules, silent_options)
-
 -- Yank to clipboard
 vim.keymap.set('n', '<leader>p', '"+', silent_options)
 vim.keymap.set('v', '<leader>p', '"+', silent_options)
@@ -61,9 +54,6 @@ vim.keymap.set('t', '<A-,>', exit_term .. tab_left, silent_options)
 vim.keymap.set('t', '<A-.>', exit_term .. tab_right, silent_options)
 vim.keymap.set('t', '<A-o>', exit_term .. window_only, silent_options)
 
-vim.keymap.set('n', '<leader>h', require("harpoon.mark").add_file)
-vim.keymap.set('n', '<leader>w', require("harpoon.ui").toggle_quick_menu)
-
 -- Terminal
 vim.keymap.set('n', '<leader>ts', ':vsplit<Cr>:terminal<Cr>i', silent_options)
 vim.keymap.set('n', '<leader>tt', ':tabe<Cr>:terminal<Cr>i', silent_options)
@@ -75,7 +65,6 @@ local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>g', builtin.git_files, {})
 vim.keymap.set('n', '<leader>f', builtin.find_files, {})
 vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>b', builtin.buffers, {}) -- replacing with harpoon
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
 --vim.keymap.set('n', '<space>f', vim.lsp.buf.format, {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
@@ -86,7 +75,24 @@ vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
 vim.keymap.set('n', 'gr', builtin.lsp_references, {})
 
 -- Filemanager
-local traveller = require('nvim-traveller')
+local traveller = require('nvim-traveller').setup({
+    show_hidden = false
+})
+
 vim.keymap.set('n', '-', traveller.open_navigation, {})
 vim.keymap.set('n', '<leader>d', traveller.open_telescope_search, silent_options)
 vim.keymap.set('n', '<leader>o', traveller.open_terminal, silent_options)
+
+local traveller_buffers = require('nvim-traveller-buffers')
+
+traveller_buffers.setup({
+    mappings = {
+        next_tab = "<Tab>",
+        previous_tab = "<S-Tab>",
+        delete_buffer = "<C-d>",
+        preview_scrolling_up = "<C-b>",
+        preview_scrolling_down = "<C-f>"
+    }
+})
+
+vim.keymap.set('n', '<leader>b', traveller_buffers.buffers, {})

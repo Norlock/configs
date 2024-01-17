@@ -12,9 +12,10 @@ vim.o.splitright = true -- Splits pane to the right
 vim.o.splitbelow = true -- Splits pane below
 vim.o.swapfile = false
 vim.o.scrolloff = 3
-vim.o.textwidth = 100
+--vim.o.textwidth = 120
 vim.o.formatoptions = "tq"
 vim.o.smartcase = true
+vim.o.ignorecase = true
 
 -- Show diagnostics in a pop-up window on hover
 _G.LspDiagnosticsPopupHandler = function()

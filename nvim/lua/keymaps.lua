@@ -66,6 +66,8 @@ vim.keymap.set('n', '<leader>g', builtin.git_files, {})
 vim.keymap.set('n', '<leader>f', builtin.find_files, {})
 vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+vim.keymap.set('n', '<leader>=', vim.lsp.buf.format, {})
+
 --vim.keymap.set('n', '<space>f', vim.lsp.buf.format, {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
 vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})

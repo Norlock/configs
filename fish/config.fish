@@ -15,6 +15,16 @@ set -x PATH $PATH /usr/sbin
 set -x PATH $PATH ~/.nodemodules/bin
 set -x PATH $PATH ~/.pulumi/bin
 
+set -gx ANDROID_HOME ~/Android/Sdk
+set -gx NDK_HOME $ANDROID_HOME/ndk/26.1.10909125
+set -gx JAVA_HOME /opt/android-studio/jbr
+set -gx PATH $PATH $ANDROID_HOME/emulator 
+set -gx PATH $PATH $ANDROID_HOME/tools 
+set -gx PATH $PATH $ANDROID_HOME/tools-bin 
+set -gx PATH $PATH $ANDROID_HOME/platform-tools 
+set -gx PATH $PATH /opt/android-studio/jbr/bin
+
+
 # Setting fd as the default source for fzf
 set -gx FZF_DEFAULT_COMMAND "fd --type f"
 

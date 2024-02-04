@@ -22,7 +22,9 @@ set $menu bemenu-run -m 1 --fn "FiraCodeNerdFontMono 20" -l 8
 ### Output configuration
 output * bg ~/Projects/configs/images/coral.jpg fill #000000
 
-output DP-2 position 3840,0
+#output DP-1 position 3840,0
+output DP-2 position 0,0
+output eDP-1 position 1920,0
 
 
 # Example configuration:

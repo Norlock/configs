@@ -89,6 +89,8 @@ require('lspconfig').jsonls.setup {}
 require('lspconfig').gopls.setup {}
 require('lspconfig').taplo.setup {}
 require('lspconfig').svelte.setup {}
+require('lspconfig').taplo.setup {}
+require('lspconfig').lua_ls.setup {}
 require('lspconfig').yamlls.setup {
     settings = {
         yaml = {

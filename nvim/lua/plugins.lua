@@ -14,7 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	-- workflow
 	'nvim-lua/plenary.nvim',
-	{ 'nvim-telescope/telescope.nvim', tag = '0.1.5' },
+	{ 'nvim-telescope/telescope.nvim', tag = '0.1.6' },
 	{
 		dir = '~/Projects/nvim-traveller',
 		init = function()

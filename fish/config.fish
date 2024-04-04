@@ -24,7 +24,6 @@ set -gx PATH $PATH $ANDROID_HOME/tools-bin
 set -gx PATH $PATH $ANDROID_HOME/platform-tools 
 set -gx PATH $PATH /opt/android-studio/jbr/bin
 
-
 # Setting fd as the default source for fzf
 set -gx FZF_DEFAULT_COMMAND "fd --type f"
 
@@ -33,6 +32,8 @@ set -gx FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
 
 alias fishConfig="nvim ~/.config/fish/config.fish"
 alias fishReload="source ~/.config/fish/config.fish"
+
+#alias screenRecord="wf-recorder -g \"$(slurp)\""
 
 # Because I'm lazy
 alias n="nvim"
@@ -43,6 +44,7 @@ alias kittyConfig="nvim ~/.config/kitty/kitty.conf"
 alias hyprConfig="nvim ~/.config/hypr/hyprland.conf"
 alias ...="cd ../.."
 alias ....="cd ../../.."
+#alias dockerRMIDangling="docker rmi $(docker images -qa -f 'dangling=true')"
 
 # Git aliases
 alias g="git"

@@ -75,7 +75,7 @@ local function format()
         vim.fn.system("cd " .. path .. " && npx prettier --write " .. file)
         vim.cmd(":e")
     else
-        vim.lsp.format()
+        vim.lsp.buf.format()
     end
 end
 

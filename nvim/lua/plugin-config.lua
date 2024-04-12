@@ -80,7 +80,15 @@ require('lspconfig').lua_ls.setup {
     },
 }
 
-require('lspconfig').rust_analyzer.setup {}
+require('lspconfig').rust_analyzer.setup {
+    settings = {
+        ["rust_analyzer"] = {
+            cargo = {
+                allFeatures = true,
+            },
+        },
+    },
+}
 require('lspconfig').wgsl_analyzer.setup {}
 require('lspconfig').tsserver.setup {}
 require('lspconfig').html.setup {}
@@ -91,6 +99,7 @@ require('lspconfig').taplo.setup {}
 require('lspconfig').svelte.setup {}
 require('lspconfig').taplo.setup {}
 require('lspconfig').lua_ls.setup {}
+require('lspconfig').pylsp.setup {}
 require('lspconfig').yamlls.setup {
     settings = {
         yaml = {

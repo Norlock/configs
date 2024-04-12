@@ -68,20 +68,22 @@ vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
 
 local function format()
-    if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' then
-        local path = vim.fn.expand('%:p:h');
-        local file = vim.fn.expand('%:p:t');
+	if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' then
+		local path = vim.fn.expand('%:p:h');
+		local file = vim.fn.expand('%:p:t');
 
-        vim.fn.system("cd " .. path .. " && npx prettier --write " .. file)
-        vim.cmd(":e")
-    else
-        vim.lsp.buf.format()
-    end
+		vim.fn.system("cd " .. path .. " && npx prettier --write " .. file)
+		vim.cmd(":e")
+	else
+		vim.lsp.buf.format()
+	end
 end
 
 vim.keymap.set('n', '<space>f', format, {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
 vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, silent_options)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, silent_options)
 
 vim.keymap.set('n', 'gd', builtin.lsp_definitions, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
@@ -89,23 +91,27 @@ vim.keymap.set('n', 'gr', builtin.lsp_references, {})
 
 -- Filemanager
 local traveller = require('nvim-traveller').setup({
-    show_hidden = false
+	show_hidden = false
 })
 
 vim.keymap.set('n', '-', traveller.open_navigation, {})
 vim.keymap.set('n', '<leader>d', traveller.all_directories_search, silent_options)
 vim.keymap.set('n', '<leader>o', traveller.open_terminal, silent_options)
 
+local nvim_traveller = require('nvim-traveller-rs')
+
+vim.keymap.set('n', '<leader>i', nvim_traveller.open_navigation, {})
+
 local traveller_buffers = require('nvim-traveller-buffers')
 
 traveller_buffers.setup({
-    mappings = {
-        next_tab = "<Tab>",
-        previous_tab = "<S-Tab>",
-        delete_buffer = "<C-d>",
-        preview_scrolling_up = "<C-b>",
-        preview_scrolling_down = "<C-f>"
-    }
+	mappings = {
+		next_tab = "<Tab>",
+		previous_tab = "<S-Tab>",
+		delete_buffer = "<C-d>",
+		preview_scrolling_up = "<C-b>",
+		preview_scrolling_down = "<C-f>"
+	}
 })
 
 vim.keymap.set('n', '<leader>b', traveller_buffers.buffers, {})

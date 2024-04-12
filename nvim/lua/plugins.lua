@@ -22,6 +22,9 @@ require("lazy").setup({
 		end
 	},
 	{
+		dir = '~/Projects/nvim-traveller-rs',
+	},
+	{
 		dir = '~/Projects/nvim-traveller-buffers',
 	},
 	--'norlock/nvim-traveller-buffers',

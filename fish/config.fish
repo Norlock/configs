@@ -62,11 +62,5 @@ alias gbr="git branch -r"
 alias gd='git diff'
 alias grhh='git reset HEAD --hard'
 
-if not pgrep --full ssh-agent | string collect > /dev/null
-  eval (ssh-agent -c)
-  set -Ux SSH_AGENT_PID $SSH_AGENT_PID
-  set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
-end
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/norlock/bin/google-cloud-sdk/path.fish.inc' ]; . '/home/norlock/bin/google-cloud-sdk/path.fish.inc'; end
+# SSH-agent
+fish_ssh_agent

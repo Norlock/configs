@@ -62,7 +62,6 @@ vim.keymap.set('t', '<leader>e', exit_term, silent_options)
 
 -- Telescope
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>g', builtin.git_files, {})
 vim.keymap.set('n', '<leader>f', builtin.find_files, {})
 vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
@@ -89,18 +88,20 @@ vim.keymap.set('n', 'gd', builtin.lsp_definitions, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
 vim.keymap.set('n', 'gr', builtin.lsp_references, {})
 
+local dap = require('dap');
+vim.keymap.set('n', '<space>b', dap.toggle_breakpoint)
+vim.keymap.set('n', '<space>c', dap.continue)
+vim.keymap.set('n', '<space>so', dap.step_over)
+vim.keymap.set('n', '<space>si', dap.step_over)
+
 -- Filemanager
-local traveller = require('nvim-traveller').setup({
-	show_hidden = false
-})
+local nvim_traveller_rs = require('nvim-traveller-rs')
 
-vim.keymap.set('n', '-', traveller.open_navigation, {})
-vim.keymap.set('n', '<leader>d', traveller.all_directories_search, silent_options)
-vim.keymap.set('n', '<leader>o', traveller.open_terminal, silent_options)
-
-local nvim_traveller = require('nvim-traveller-rs')
-
-vim.keymap.set('n', '<leader>i', nvim_traveller.open_navigation, {})
+vim.keymap.set('n', '-', nvim_traveller_rs.open_navigation, {})
+vim.keymap.set('n', '<leader>d', nvim_traveller_rs.directory_search, silent_options)
+vim.keymap.set('n', '<leader>s', nvim_traveller_rs.file_search, silent_options)
+vim.keymap.set('n', '<leader>g', nvim_traveller_rs.git_file_search, {})
+vim.keymap.set('n', '<leader>b', nvim_traveller_rs.buffer_search, {})
 
 local traveller_buffers = require('nvim-traveller-buffers')
 
@@ -114,4 +115,4 @@ traveller_buffers.setup({
 	}
 })
 
-vim.keymap.set('n', '<leader>b', traveller_buffers.buffers, {})
+--vim.keymap.set('n', '<leader>b', traveller_buffers.buffers, {})

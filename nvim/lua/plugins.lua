@@ -16,13 +16,9 @@ require("lazy").setup({
 	'nvim-lua/plenary.nvim',
 	{ 'nvim-telescope/telescope.nvim', tag = '0.1.6' },
 	{
-		dir = '~/Projects/nvim-traveller',
-		init = function()
-			vim.o.formatoptions = "tq"
-		end
-	},
-	{
-		dir = '~/Projects/nvim-traveller-rs',
+        dir = '~/Projects/nvim-traveller-rs',
+		--"norlock/nvim-traveller-rs",
+		--build = "./prepare.sh"
 	},
 	{
 		dir = '~/Projects/nvim-traveller-buffers',
@@ -33,6 +29,7 @@ require("lazy").setup({
 		event = "InsertEnter",
 		opts = {} -- this is equalent to setup({}) function
 	},
+	'mfussenegger/nvim-dap',
 
 	-- Themes
 	{ "rebelot/kanagawa.nvim",         lazy = true },

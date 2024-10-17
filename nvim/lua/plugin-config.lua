@@ -90,16 +90,15 @@ require('lspconfig').rust_analyzer.setup {
     },
 }
 require('lspconfig').wgsl_analyzer.setup {}
-require('lspconfig').tsserver.setup {}
+require('lspconfig').ts_ls.setup {}
 require('lspconfig').html.setup {}
 require('lspconfig').cssls.setup {}
 require('lspconfig').jsonls.setup {}
 require('lspconfig').gopls.setup {}
-require('lspconfig').taplo.setup {}
 require('lspconfig').svelte.setup {}
-require('lspconfig').taplo.setup {}
 require('lspconfig').lua_ls.setup {}
 require('lspconfig').pylsp.setup {}
+require('lspconfig').gleam.setup({})
 require('lspconfig').yamlls.setup {
     settings = {
         yaml = {
@@ -112,8 +111,18 @@ require('lspconfig').yamlls.setup {
     }
 }
 
+require("lspconfig").taplo.setup{}
+
+require("dap/rust")
 
 require("mason").setup()
+
+local dap = require("dap")
+dap.adapters.gdb = {
+  type = "executable",
+  command = "gdb",
+  args = { "-i", "dap" }
+}
 
 -- Telescope
 local actions = require("telescope.actions")

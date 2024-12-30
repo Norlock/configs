@@ -3,6 +3,7 @@ window-padding-x = 5
 window-padding-y = 5
 window-padding-balance = true
 window-decoration = false
+mouse-scroll-multiplier = 0.5
 background-opacity = 0.95
 font-family=FiraCodeNerdFontMono
 font-size=14

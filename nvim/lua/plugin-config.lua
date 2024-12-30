@@ -98,7 +98,15 @@ require('lspconfig').gopls.setup {}
 require('lspconfig').svelte.setup {}
 require('lspconfig').lua_ls.setup {}
 require('lspconfig').pylsp.setup {}
-require('lspconfig').gleam.setup({})
+require('lspconfig').gleam.setup {}
+require('lspconfig').astro.setup {
+    capabilities = capabilities,
+    init_options = {
+        typescript = {
+            tsdk = "/home/norlock/.local/share/nvim/mason/packages/astro-language-server/node_modules/typescript/lib/"
+        },
+    },
+}
 require('lspconfig').yamlls.setup {
     settings = {
         yaml = {
@@ -111,7 +119,7 @@ require('lspconfig').yamlls.setup {
     }
 }
 
-require("lspconfig").taplo.setup{}
+require("lspconfig").taplo.setup {}
 
 require("dap/rust")
 
@@ -119,9 +127,9 @@ require("mason").setup()
 
 local dap = require("dap")
 dap.adapters.gdb = {
-  type = "executable",
-  command = "gdb",
-  args = { "-i", "dap" }
+    type = "executable",
+    command = "gdb",
+    args = { "-i", "dap" }
 }
 
 -- Telescope

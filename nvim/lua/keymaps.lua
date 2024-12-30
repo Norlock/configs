@@ -81,8 +81,10 @@ end
 vim.keymap.set('n', '<space>f', format, {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
 vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, silent_options)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, silent_options)
+vim.keymap.set('n', '<M-k>', '<cmd>cprev<Cr>', silent_options)
+vim.keymap.set('n', '<M-j>', '<cmd>cnext<Cr>', silent_options)
+vim.keymap.set('n', '<M-d>', vim.diagnostic.setqflist, silent_options)
+
 
 vim.keymap.set('n', 'gd', builtin.lsp_definitions, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})

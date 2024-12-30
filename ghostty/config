@@ -1,0 +1,11 @@
+window-padding-x = 5
+window-padding-y = 5
+window-padding-balance = true
+window-decoration = false
+font-family=FiraCodeNerdFontMono
+font-size=14
+keybind = ctrl+shift+h=goto_split:left
+keybind = ctrl+shift+l=goto_split:right
+keybind = ctrl+shift+j=goto_split:bottom
+keybind = ctrl+shift+k=goto_split:top
+keybind = ctrl+shift+o=toggle_tab_overview

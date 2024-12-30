@@ -48,7 +48,7 @@ require("lazy").setup({
 				flavour = "frappe" -- latte, frappe, macchiato, mocha
 			})
 
-			vim.cmd.colorscheme("catppuccin")
+            vim.cmd.colorscheme("catppuccin")
 		end
 	},
 

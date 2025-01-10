@@ -2,9 +2,18 @@
 All my config files.
 
 # Tools to install ->
-* ranger 
 * fd
 * fzf
 * ripgrep
-* aplay (music stream)
-* fisherman, z plugin
+* zellij 
+* hyprland
+* hyprpaper 
+* hyprlock
+* paru
+* btop
+
+### Fish
+* zioxide
+
+### Todo 
+Create gpg key and enable signing commits

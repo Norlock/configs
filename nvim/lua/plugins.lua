@@ -16,14 +16,10 @@ require("lazy").setup({
 	'nvim-lua/plenary.nvim',
 	{ 'nvim-telescope/telescope.nvim', tag = '0.1.8' },
 	{
-        dir = '~/Projects/nvim-traveller-rs',
+        dir = '~/projects/nvim-traveller-rs',
 		--"norlock/nvim-traveller-rs",
 		--build = "./prepare.sh"
 	},
-	{
-		dir = '~/Projects/nvim-traveller-buffers',
-	},
-	--'norlock/nvim-traveller-buffers',
 	{
 		'windwp/nvim-autopairs',
 		event = "InsertEnter",

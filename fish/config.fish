@@ -63,4 +63,6 @@ alias gd='git diff'
 alias grhh='git reset HEAD --hard'
 
 # SSH-agent
-fish_ssh_agent
+#fish_ssh_agent
+
+zoxide init fish | source

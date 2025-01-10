@@ -105,16 +105,4 @@ vim.keymap.set('n', '<leader>s', nvim_traveller_rs.file_search, silent_options)
 vim.keymap.set('n', '<leader>g', nvim_traveller_rs.git_file_search, {})
 vim.keymap.set('n', '<leader>b', nvim_traveller_rs.buffer_search, {})
 
-local traveller_buffers = require('nvim-traveller-buffers')
-
-traveller_buffers.setup({
-	mappings = {
-		next_tab = "<Tab>",
-		previous_tab = "<S-Tab>",
-		delete_buffer = "<C-d>",
-		preview_scrolling_up = "<C-b>",
-		preview_scrolling_down = "<C-f>"
-	}
-})
-
 --vim.keymap.set('n', '<leader>b', traveller_buffers.buffers, {})

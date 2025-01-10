@@ -1,0 +1,36 @@
+[background]
+path = "/etc/greetd/lake-mountain.jpg"
+
+fit = "Fill"
+
+[GTK]
+# Whether to use the dark theme
+application_prefer_dark_theme = true
+
+# Cursor theme name
+cursor_theme_name = "Adwaita"
+
+# Font name and size
+font_name = "Cantarell 16"
+
+# Icon theme name
+icon_theme_name = "Adwaita"
+
+# GTK theme name
+theme_name = "Adwaita"
+
+[commands]
+reboot = [ "systemctl", "reboot" ]
+poweroff = [ "systemctl", "poweroff" ]
+
+[widget.clock]
+# strftime format argument
+# See https://docs.rs/jiff/0.1.14/jiff/fmt/strtime/index.html#conversion-specifications
+format = "%a %H:%M"
+
+# How often to update the text
+resolution = "500ms"
+
+# Ask GTK to make the label at least this wide. This helps keeps the parent element layout and width consistent.
+# Experiment with different widths, the interpretation of this value is entirely up to GTK.
+label_width = 150

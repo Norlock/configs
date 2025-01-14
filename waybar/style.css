@@ -47,7 +47,8 @@ window#waybar {
 }
 
 #clock {
-  background-color: #591A48;
+  /*background-color: #591A48;*/
+  background-color: #222;
   color: #ffffff;
 }
 
@@ -58,7 +59,8 @@ window#waybar {
 }
 
 #battery {
-  color: #0a2010;
+  /*color: #0a2010;*/
+  color: black;
   background-color: #2c9448;
 }
 
@@ -89,7 +91,7 @@ window#waybar {
 }
 
 #network {
-  color: #0a2010;
+  color: black;
   /*color: #d3f2dc;*/
   background-color: #2c9448;
 }
@@ -99,7 +101,7 @@ window#waybar {
 }
 
 #pulseaudio {
-  color: #0a2010;
+  color: black;
   /*color: #d3f2dc;*/
   background-color: #2c9448;
 }

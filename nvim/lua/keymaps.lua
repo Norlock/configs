@@ -64,18 +64,21 @@ vim.keymap.set('t', '<leader>e', exit_term, silent_options)
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>f', builtin.find_files, {})
 vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>g', builtin.git_files, {})
+vim.keymap.set('n', '<leader>b', builtin.buffers, {})
+vim.keymap.set('n', '<leader>d', builtin.fd, {})
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
 
 local function format()
-	if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' then
-		local path = vim.fn.expand('%:p:h');
-		local file = vim.fn.expand('%:p:t');
+    if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' then
+        local path = vim.fn.expand('%:p:h');
+        local file = vim.fn.expand('%:p:t');
 
-		vim.fn.system("cd " .. path .. " && npx prettier --write " .. file)
-		vim.cmd(":e")
-	else
-		vim.lsp.buf.format()
-	end
+        vim.fn.system("cd " .. path .. " && npx prettier --write " .. file)
+        vim.cmd(":e")
+    else
+        vim.lsp.buf.format()
+    end
 end
 
 vim.keymap.set('n', '<space>f', format, {})
@@ -100,9 +103,8 @@ vim.keymap.set('n', '<space>si', dap.step_over)
 local nvim_traveller_rs = require('nvim-traveller-rs')
 
 vim.keymap.set('n', '-', nvim_traveller_rs.open_navigation, {})
-vim.keymap.set('n', '<leader>d', nvim_traveller_rs.directory_search, silent_options)
-vim.keymap.set('n', '<leader>s', nvim_traveller_rs.file_search, silent_options)
-vim.keymap.set('n', '<leader>g', nvim_traveller_rs.git_file_search, {})
-vim.keymap.set('n', '<leader>b', nvim_traveller_rs.buffer_search, {})
+--vim.keymap.set('n', '<leader>d', nvim_traveller_rs.directory_search, silent_options)
+--vim.keymap.set('n', '<leader>g', nvim_traveller_rs.git_file_search, {})
+--vim.keymap.set('n', '<leader>b', nvim_traveller_rs.buffer_search, {})
 
 --vim.keymap.set('n', '<leader>b', traveller_buffers.buffers, {})

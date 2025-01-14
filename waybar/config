@@ -40,12 +40,12 @@
     "pulseaudio": {
         //"scroll-step": 1,
         "format": "{volume}% {icon}",
-        "format-bluetooth": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon} ",
         "format-muted": "",
         "format-icons": {
             "headphones": "",
             "handsfree": "",
-            "headset": "",
+            "headset": "\udb80\udece",
             "phone": "",
             "portable": "",
             "car": "",
@@ -95,7 +95,7 @@
     "hyprland/window": {
         "format": "{}",
         "rewrite": {
-            "(.*) — Mozilla Firefox": "🌎 $1",
+            "(.*) — Firefox Developer Edition": "🌎 $1",
             "(.*) - fish": "> [$1]"
         },
         "separate-outputs": true

@@ -100,7 +100,6 @@ require('lspconfig').lua_ls.setup {}
 require('lspconfig').pylsp.setup {}
 require('lspconfig').gleam.setup {}
 require('lspconfig').astro.setup {
-    capabilities = capabilities,
     init_options = {
         typescript = {
             tsdk = "/home/norlock/.local/share/nvim/mason/packages/astro-language-server/node_modules/typescript/lib/"

@@ -61,6 +61,7 @@ alias gba="git branch -a"
 alias gbr="git branch -r"
 alias gd='git diff'
 alias grhh='git reset HEAD --hard'
+alias cat='bat --decorations never'
 
 # SSH-agent
 #fish_ssh_agent

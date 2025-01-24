@@ -92,20 +92,12 @@ require('lspconfig').rust_analyzer.setup {
 require('lspconfig').wgsl_analyzer.setup {}
 require('lspconfig').ts_ls.setup {}
 require('lspconfig').html.setup {}
-require('lspconfig').cssls.setup {}
 require('lspconfig').jsonls.setup {}
 require('lspconfig').gopls.setup {}
 require('lspconfig').svelte.setup {}
 require('lspconfig').lua_ls.setup {}
 require('lspconfig').pylsp.setup {}
 require('lspconfig').gleam.setup {}
-require('lspconfig').astro.setup {
-    init_options = {
-        typescript = {
-            tsdk = "/home/norlock/.local/share/nvim/mason/packages/astro-language-server/node_modules/typescript/lib/"
-        },
-    },
-}
 require('lspconfig').yamlls.setup {
     settings = {
         yaml = {
@@ -118,6 +110,12 @@ require('lspconfig').yamlls.setup {
     }
 }
 
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+require('lspconfig').cssls.setup {
+    capabilities = capabilities
+}
 require("lspconfig").taplo.setup {}
 
 require("dap/rust")

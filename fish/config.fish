@@ -36,7 +36,7 @@ alias fishReload="source ~/.config/fish/config.fish"
 #alias screenRecord="wf-recorder -g \"$(slurp)\""
 
 # Because I'm lazy
-alias n="nvim"
+alias nv="nvim"
 alias nvimConfig="nvim ~/.config/nvim/init.lua"
 alias swayConfig="nvim ~/.config/sway/config"
 alias footConfig="nvim ~/.config/foot/foot.ini"
@@ -44,7 +44,7 @@ alias ghostConfig="nvim ~/.config/ghostty/config"
 alias hyprConfig="nvim ~/.config/hypr/hyprland.conf"
 alias ...="cd ../.."
 alias ....="cd ../../.."
-#alias dockerRMIDangling="docker rmi $(docker images -qa -f 'dangling=true')"
+alias hx="helix"
 
 # Git aliases
 alias g="git"

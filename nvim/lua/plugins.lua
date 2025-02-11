@@ -14,7 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     -- workflow
     'nvim-lua/plenary.nvim',
-    { 'nvim-telescope/telescope.nvim',    tag = '0.1.8' },
+    'nvim-telescope/telescope.nvim',
     {
         'windwp/nvim-autopairs',
         event = "InsertEnter",
@@ -24,9 +24,9 @@ require("lazy").setup({
     { dir = "~/projects/nvim-traveller-rs" },
 
     -- Themes
-    { "rebelot/kanagawa.nvim",            lazy = true },
-    { "morhetz/gruvbox",                  lazy = true },
-    { "nvim-tree/nvim-web-devicons",      lazy = true },
+    { "rebelot/kanagawa.nvim",             lazy = true },
+    { "morhetz/gruvbox",                   lazy = true },
+    { "nvim-tree/nvim-web-devicons",       lazy = true },
 
     'nvim-lualine/lualine.nvim',
 

@@ -70,7 +70,7 @@ vim.keymap.set('n', '<leader>d', builtin.fd, {})
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
 
 local function format()
-    if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' then
+    if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' or vim.bo.filetype == 'javascript' then
         local path = vim.fn.expand('%:p:h');
         local file = vim.fn.expand('%:p:t');
 

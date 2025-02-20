@@ -5,6 +5,7 @@ set -gx MOZ_ENABLE_WAYLAND
 set -gx QT_QPA_PLATFORM wayland
 
 set -gx EDITOR nvim
+set -gx TERM ghostty
 #set -gx BROWSER brave
 #set -gx XDG_RUNTIME_DIR ~/.config
 

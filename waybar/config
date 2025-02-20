@@ -14,7 +14,8 @@
         "spacing": 10
     },
     "clock": {
-        "tooltip-format": "{:%Y-%m-%d | %H:%M}",
+        "tooltip-format": "{:%Y-%m-%d}",
+        "format": "{:%H:%M - %A}",
         "format-alt": "{:%Y-%m-%d}"
     },
     "battery": {

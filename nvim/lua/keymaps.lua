@@ -61,13 +61,11 @@ vim.keymap.set('n', '<leader>tr', ':terminal<Cr>i', silent_options)
 vim.keymap.set('t', '<leader>e', exit_term, silent_options)
 
 -- Telescope
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>f', builtin.find_files, {})
-vim.keymap.set('n', '<leader>a', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>g', builtin.git_files, {})
-vim.keymap.set('n', '<leader>b', builtin.buffers, {})
-vim.keymap.set('n', '<leader>d', builtin.fd, {})
-vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+local fzf = require('fzf-lua')
+vim.keymap.set('n', '<leader>f', fzf.files, {})
+vim.keymap.set('n', '<leader>g', fzf.git_files, {})
+vim.keymap.set('n', '<leader>a', fzf.grep_project, {})
+vim.keymap.set('n', '<leader>b', fzf.buffers, {})
 
 local function format()
     if vim.bo.filetype == 'svelte' or vim.bo.filetype == 'typescript' or vim.bo.filetype == 'javascript' then
@@ -87,11 +85,12 @@ vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<Cr>', silent_options)
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<Cr>', silent_options)
 vim.keymap.set('n', '<M-d>', vim.diagnostic.setqflist, silent_options)
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+vim.keymap.set('n', '<space>d', vim.diagnostic.open_float)
 
-
-vim.keymap.set('n', 'gd', builtin.lsp_definitions, {})
+vim.keymap.set('n', 'gd', fzf.lsp_definitions, {})
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {})
-vim.keymap.set('n', 'gr', builtin.lsp_references, {})
+vim.keymap.set('n', 'gr', fzf.lsp_references, {})
 
 local dap = require('dap');
 vim.keymap.set('n', '<space>b', dap.toggle_breakpoint)

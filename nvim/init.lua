@@ -19,17 +19,6 @@ vim.o.smartcase = true
 vim.o.ignorecase = true
 
 -- Show diagnostics in a pop-up window on hover
-vim.lsp.handlers["textDocument/hover"] =
-    vim.lsp.with(vim.lsp.handlers.hover, {})
-
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-    vim.lsp.diagnostic.on_publish_diagnostics, {
-        virtual_text = true,
-        underline = false,
-        signs = true,
-    }
-)
-
 vim.filetype.add({ extension = { wgsl = "wgsl" } })
 
 vim.cmd [[

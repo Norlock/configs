@@ -129,21 +129,6 @@ dap.adapters.gdb = {
     args = { "-i", "dap" }
 }
 
--- Telescope
-local actions = require("telescope.actions")
-local telescope = require("telescope")
-
-telescope.setup({
-    defaults = {
-        previewer = true,
-        mappings = {
-            i = {
-                ["<Esc>"] = actions.close,
-            },
-        },
-    },
-})
-
 -- Lualine
 require('lualine').setup {
     options = {
@@ -200,4 +185,19 @@ require('nvim-treesitter.configs').setup {
     highlight = {
         enable = true
     },
+}
+
+require("fzf-lua").setup {
+    -- MISC GLOBAL SETUP OPTIONS, SEE BELOW
+    -- fzf_bin = ...,
+    -- each of these options can also be passed as function that return options table
+    -- e.g. winopts = function() return { ... } end
+    winopts = {
+        height = 0.90,           -- window height
+        width  = 0.95,           -- window width
+        row    = 0.20,           -- window row position (0=top, 1=bottom)
+        col    = 0.50,           -- window col position (0=left, 1=right)
+    },                           -- UI Options
+    -- SPECIFIC COMMAND/PICKER OPTIONS, SEE BELOW
+    -- files = { ... },
 }

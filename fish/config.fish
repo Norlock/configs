@@ -14,7 +14,6 @@ set -x PATH $PATH ~/.cargo/bin
 set -x PATH $PATH ~/.local/bin
 set -x PATH $PATH /usr/sbin
 set -x PATH $PATH ~/.nodemodules/bin
-set -x PATH $PATH ~/.pulumi/bin
 
 set -gx ANDROID_HOME ~/Android/Sdk
 set -gx NDK_HOME $ANDROID_HOME/ndk/26.1.10909125

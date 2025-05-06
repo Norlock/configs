@@ -14,11 +14,9 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     -- workflow
     'nvim-lua/plenary.nvim',
-    'nvim-telescope/telescope.nvim',
     {
-        'windwp/nvim-autopairs',
-        event = "InsertEnter",
-        opts = {} -- this is equalent to setup({}) function
+        "ibhagwan/fzf-lua",
+        opts = {}
     },
     'mfussenegger/nvim-dap',
     { dir = "~/projects/nvim-traveller-rs" },

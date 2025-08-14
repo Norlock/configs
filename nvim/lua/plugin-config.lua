@@ -1,28 +1,6 @@
 -- Set up nvim-cmp
 local cmp = require("cmp")
 
-local cmp_mappings = cmp.mapping.preset.insert({
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    --["<Tab>"] = cmp.mapping(function(fallback)
-    --if luasnip.expand_or_jumpable() then
-    --luasnip.expand_or_jump()
-    --else
-    --fallback()
-    --end
-    --end, { "i", "s" }),
-    --["<S-Tab>"] = cmp.mapping(function(fallback)
-    --if luasnip.jumpable(-1) then
-    --luasnip.jump(-1)
-    --else
-    --fallback()
-    --end
-    --end, { "i", "s" }),
-})
-
 cmp.setup({
     snippet = {
         expand = function(args)
@@ -33,7 +11,13 @@ cmp.setup({
         completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
     },
-    mapping = cmp_mappings,
+    mapping = cmp.mapping.preset.insert({
+        ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.abort(),
+        ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
         { name = 'nvim_lsp_signature_help' },
@@ -89,38 +73,46 @@ require('lspconfig').rust_analyzer.setup {
         },
     },
 }
-require('lspconfig').wgsl_analyzer.setup {}
-require('lspconfig').ts_ls.setup {}
-require('lspconfig').html.setup {}
-require('lspconfig').jsonls.setup {}
-require('lspconfig').gopls.setup {}
-require('lspconfig').svelte.setup {}
-require('lspconfig').lua_ls.setup {}
-require('lspconfig').pylsp.setup {}
+
 require('lspconfig').gleam.setup {}
-require('lspconfig').yamlls.setup {
-    settings = {
-        yaml = {
-            format = {
-                enable = true,
-                singleQuote = false,
-                bracketSpacing = true
-            },
-        }
-    }
+
+require('lspconfig').tailwindcss.setup {
+    filetypes = {
+        "html",
+        "astro",
+        "javascript",
+        "typescript",
+        "react",
+        "gleam",
+    },
 }
+--require('lspconfig').wgsl_analyzer.setup {}
+--require('lspconfig').ts_ls.setup {}
+--require('lspconfig').html.setup {}
+--require('lspconfig').jsonls.setup {}
+--require('lspconfig').gopls.setup {}
+--require('lspconfig').svelte.setup {}
+--require('lspconfig').lua_ls.setup {}
+--require('lspconfig').pylsp.setup {}
+--require('lspconfig').yamlls.setup {
+--settings = {
+--yaml = {
+--format = {
+--enable = true,
+--singleQuote = false,
+--bracketSpacing = true
+--},
+--}
+--}
+--}
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-require('lspconfig').cssls.setup {
-    capabilities = capabilities
-}
-require("lspconfig").taplo.setup {}
-
-require("dap/rust")
-
-require("mason").setup()
+--require('lspconfig').cssls.setup {}
+--require("lspconfig").taplo.setup {}
+require("mason").setup {}
+require("mason-lspconfig").setup {}
 
 local dap = require("dap")
 dap.adapters.gdb = {
@@ -189,15 +181,14 @@ require('nvim-treesitter.configs').setup {
 
 require("fzf-lua").setup {
     -- MISC GLOBAL SETUP OPTIONS, SEE BELOW
-    -- fzf_bin = ...,
     -- each of these options can also be passed as function that return options table
     -- e.g. winopts = function() return { ... } end
     winopts = {
-        height = 0.90,           -- window height
-        width  = 0.95,           -- window width
-        row    = 0.20,           -- window row position (0=top, 1=bottom)
-        col    = 0.50,           -- window col position (0=left, 1=right)
-    },                           -- UI Options
+        height = 0.90, -- window height
+        width  = 0.95, -- window width
+        row    = 0.20, -- window row position (0=top, 1=bottom)
+        col    = 0.50, -- window col position (0=left, 1=right)
+    },                 -- UI Options
     -- SPECIFIC COMMAND/PICKER OPTIONS, SEE BELOW
     -- files = { ... },
 }

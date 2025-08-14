@@ -80,6 +80,7 @@ local function format()
 end
 
 vim.keymap.set('n', '<space>f', format, {})
+vim.keymap.set('n', '<leader>s', ":ISwap<Cr>", {})
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, {})
 vim.keymap.set('n', '<Leader>q', vim.lsp.buf.code_action, {})
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<Cr>', silent_options)

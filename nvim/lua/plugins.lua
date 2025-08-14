@@ -23,9 +23,7 @@ require("lazy").setup({
 
     -- Themes
     { "rebelot/kanagawa.nvim",             lazy = true },
-    { "morhetz/gruvbox",                   lazy = true },
     { "nvim-tree/nvim-web-devicons",       lazy = true },
-
     'nvim-lualine/lualine.nvim',
 
     {
@@ -44,7 +42,8 @@ require("lazy").setup({
 
     -- LSP
     { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
+    "mason-org/mason-lspconfig.nvim",
     'neovim/nvim-lspconfig',
     'hrsh7th/cmp-nvim-lsp',
     'hrsh7th/cmp-nvim-lsp-signature-help',

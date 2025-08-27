@@ -21,16 +21,3 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
 vim.opt.expandtab = true
-
---vim.api.nvim_create_autocmd('FileType', {
---    callback = function(args)
---        local filetype = args.match
---        local lang = vim.treesitter.language.get_lang(filetype)
---
---        if vim.treesitter.language.add(lang) then
---            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
---            vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
---            vim.treesitter.start()
---        end
---    end,
---})

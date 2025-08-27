@@ -31,6 +31,7 @@ local lsp_config = {
         vim.lsp.enable("rust_analyzer")
         vim.lsp.enable("tailwindcss")
         vim.lsp.enable("typescript")
+        vim.lsp.enable("cssls")
 
         vim.lsp.config("tailwindcss", {
             filetypes = {
@@ -74,9 +75,9 @@ local tree_sitter =
     lazy = false,
     branch = 'main',
     build = ':TSUpdate',
-    --config = function()
-    --    require 'nvim-treesitter'.install { "rust", "lua", "vim", "vimdoc", "javascript", "gleam", "html", "css", "json", "markdown" }
-    --end
+    config = function()
+       require('nvim-treesitter').install({ "rust", "lua", "vim", "vimdoc", "javascript", "gleam", "html", "css", "json", "markdown" }):wait(300000)
+    end
 }
 
 local blink = {

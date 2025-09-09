@@ -29,31 +29,9 @@ local lsp_config = {
         vim.lsp.enable("lua_ls")
         vim.lsp.enable("gleam")
         vim.lsp.enable("rust_analyzer")
-        vim.lsp.enable("tailwindcss")
-        vim.lsp.enable("typescript")
+        vim.lsp.enable("ts_ls")
         vim.lsp.enable("cssls")
 
-        vim.lsp.config("tailwindcss", {
-            filetypes = {
-                "html",
-                "astro",
-                "javascript",
-                "typescript",
-                "react",
-                "gleam",
-            },
-            settings = {
-                tailwindCSS = {
-                    includeLanguages = {
-                        gleam = "javascript",
-                    },
-                    classFunctions = {
-                        "class",
-                        "classes",
-                    },
-                },
-            }
-        })
     end
 }
 

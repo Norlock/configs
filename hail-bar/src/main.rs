@@ -26,6 +26,7 @@ enum Message {
     NoOp,
 }
 
+#[derive(Debug)]
 struct State {
     wifi_handle: svg::Handle,
     audio_handle: svg::Handle,
@@ -40,6 +41,7 @@ struct Display {
     power_str: String,
     current_workspace: u32,
     date_time: DateTime<Local>,
+    delta_ms: u64,
 }
 
 const SVG_SIZE: u32 = 16;
@@ -91,6 +93,7 @@ fn init() -> (State, Task<Message>) {
         power_str: "-".into(),
         current_workspace: 1,
         date_time: Local::now(),
+        delta_ms: 1000,
     };
 
     let state = State {
@@ -111,14 +114,30 @@ fn app_style(_state: &State, _theme: &iced::Theme) -> theme::Style {
 }
 
 fn update(state: &mut State, message: Message) -> Task<Message> {
+    let current_ms = state.display.delta_ms;
+    let current_ws = state.display.current_workspace;
+    let current_wifi_str = state.display.wifi_str.clone();
+
     match message {
-        Message::Tick(_) => Task::future(async {
+        Message::Tick(instant) => Task::future(async move {
+            let elapsed_ms: u64 = instant.elapsed().as_millis().try_into().unwrap();
+
+            let mut delta_ms = current_ms + elapsed_ms;
+
+            let wifi_str = if 1000 < delta_ms {
+                delta_ms -= 1000;
+                get_wifi_str().await.unwrap_or("? WiFi".into())
+            } else {
+                current_wifi_str
+            };
+
             let display = Display {
                 date_time: Local::now(),
-                wifi_str: get_wifi_str().await.unwrap_or("? WiFi".into()),
                 audio_str: get_audio_str().await.unwrap_or("? audio".into()),
                 power_str: get_power_str().await.unwrap_or("? battery".into()),
-                current_workspace: get_current_workspace().await.unwrap_or(1),
+                current_workspace: get_current_workspace(current_ws).await.unwrap_or(1),
+                wifi_str,
+                delta_ms,
             };
 
             Message::SetDisplay(display)
@@ -174,33 +193,23 @@ async fn set_workspace(index: u32) -> tokio::io::Result<()> {
     Ok(())
 }
 
-async fn get_current_workspace() -> tokio::io::Result<u32> {
-    let mut niri = Command::new("niri")
+async fn get_current_workspace(mut current_ws: u32) -> tokio::io::Result<u32> {
+    let niri = Command::new("niri")
         .args(["msg", "workspaces"])
-        .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .spawn()?;
+        .output()
+        .await?;
 
-    let niri_out: Stdio = niri
-        .stdout
-        .take()
-        .unwrap()
-        .try_into()
-        .expect("failed to convert to Stdio");
+    for line in String::from_utf8_lossy(&niri.stdout).lines() {
+        if line.contains("*") {
+            current_ws = line.split_whitespace()
+                .last()
+                .and_then(|word| word.trim().parse().ok())
+                .unwrap_or(1)
+        }
+    }
 
-    let rg = Command::new("rg")
-        .args(["\\*", "-r", "$1"])
-        .stdin(niri_out) // Pipe ls_output to grep's stdin
-        .stdout(Stdio::piped())
-        .spawn()?;
-
-    let output = rg.wait_with_output().await?;
-
-    let err = io::Error::new(io::ErrorKind::InvalidData, "Expected an integer");
-    String::from_utf8_lossy(&output.stdout)
-        .trim()
-        .parse()
-        .map_err(|_| err)
+    Ok(current_ws)
 }
 
 async fn get_wifi_str() -> io::Result<String> {
@@ -239,13 +248,12 @@ async fn get_audio_str() -> io::Result<String> {
 }
 
 async fn get_power_str() -> io::Result<String> {
-    let battery = Command::new("cat")
-        .arg("/sys/class/power_supply/BAT1/capacity")
-        .stdout(Stdio::piped())
-        .output()
-        .await?;
-
-    Ok(String::from_utf8_lossy(&battery.stdout).trim().to_string())
+    Ok(
+        tokio::fs::read_to_string("/sys/class/power_supply/BAT1/capacity")
+            .await?
+            .trim()
+            .to_string(),
+    )
 }
 
 fn view(state: &State) -> Element<'_, Message> {

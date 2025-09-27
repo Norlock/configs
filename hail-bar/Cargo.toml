@@ -7,4 +7,4 @@ edition = "2024"
 iced_layershell = { git = "https://github.com/waycrate/exwlshelleventloop", ref = "master" }
 iced = { git = "https://github.com/iced-rs/iced.git", ref = "master", features = ["svg", "tokio"] }
 chrono = "0.4.42"
-tokio = { version = "1.47.1", features = ["process"] }
+tokio = { version = "1.47.1", features = ["fs", "process"] }

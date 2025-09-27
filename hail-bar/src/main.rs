@@ -7,7 +7,7 @@ use iced::{
     Alignment, Background, Border, Color, Element, Length, Subscription, Task, padding, theme,
 };
 use iced_layershell::build_pattern::application;
-use iced_layershell::reexport::Anchor;
+use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::LayerShellSettings;
 use iced_layershell::to_layer_message;
 use std::process::Stdio;
@@ -53,7 +53,9 @@ fn main() -> iced_layershell::Result {
         .layer_settings(LayerShellSettings {
             size: Some((1920, 32)),
             anchor: Anchor::Bottom | Anchor::Left | Anchor::Right,
-            margin: (0, 10, 0, 10),
+            margin: (0, 10, 5, 10),
+            layer: Layer::Top,
+            exclusive_zone: 28,
             ..Default::default()
         })
         .subscription(subscriptions)

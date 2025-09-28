@@ -434,17 +434,27 @@ fn time_date(state: &State) -> Element<'_, Message> {
 fn info(state: &State) -> Element<'_, Message> {
     let display = &state.display;
 
-    let wifi_handle = match display.network.strength {
-        WifiStrength::Excellent => state.wifi_good_handle.clone(),
-        WifiStrength::Good => state.wifi_good_handle.clone(),
-        WifiStrength::Medium => state.wifi_medium_handle.clone(),
-        WifiStrength::Bad => state.wifi_bad_handle.clone(),
+    let (wifi_handle, color) = match display.network.strength {
+        WifiStrength::Excellent => (
+            state.wifi_good_handle.clone(),
+            Color::from_rgb8(76, 175, 80),
+        ),
+        WifiStrength::Good => (
+            state.wifi_good_handle.clone(),
+            Color::from_rgb8(139, 195, 74),
+        ),
+        WifiStrength::Medium => (
+            state.wifi_medium_handle.clone(),
+            Color::from_rgb8(255, 193, 7),
+        ),
+        WifiStrength::Bad => (state.wifi_bad_handle.clone(), Color::from_rgb8(244, 67, 54)),
     };
 
     container(
         row![
             module(row![
                 svg(wifi_handle)
+                    .style(move |_, _| { svg::Style { color: Some(color) } })
                     .width(SVG_SIZE)
                     .height(SVG_SIZE),
                 text(&display.network.ssid)

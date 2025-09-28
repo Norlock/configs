@@ -2,7 +2,7 @@ use chrono::{DateTime, Local};
 use iced::border::Radius;
 use iced::futures::io;
 use iced::time::milliseconds;
-use iced::widget::{button, container, row, svg, text, Button, Container, Row};
+use iced::widget::{Button, Container, Row, button, container, row, svg, text};
 use iced::{
     Alignment, Background, Border, Color, Element, Length, Subscription, Task, padding, theme,
 };
@@ -32,9 +32,34 @@ struct Workspaces {
     current: u32,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum WifiStrength {
+    Excellent,
+    Good,
+    Medium,
+    Bad,
+}
+
+#[derive(Debug, Clone)]
+struct Network {
+    ssid: String,
+    strength: WifiStrength,
+}
+
+impl Default for Network {
+    fn default() -> Self {
+        Self {
+            ssid: "-".into(),
+            strength: WifiStrength::Medium,
+        }
+    }
+}
+
 #[derive(Debug)]
 struct State {
-    wifi_handle: svg::Handle,
+    wifi_good_handle: svg::Handle,
+    wifi_medium_handle: svg::Handle,
+    wifi_bad_handle: svg::Handle,
     audio_handle: svg::Handle,
     power_handle: svg::Handle,
     display: Display,
@@ -42,10 +67,10 @@ struct State {
 
 #[derive(Debug, Clone)]
 struct Display {
-    wifi_str: String,
     audio_str: String,
     power_str: String,
     workspaces: Workspaces,
+    network: Network,
     date_time: DateTime<Local>,
     delta_ms: u64,
 }
@@ -80,8 +105,20 @@ fn namespace() -> String {
 }
 
 fn init() -> (State, Task<Message>) {
-    let wifi_handle =
-        svg::Handle::from_path(format!("{}/resources/wifi.svg", env!("CARGO_MANIFEST_DIR")));
+    let wifi_good_handle = svg::Handle::from_path(format!(
+        "{}/resources/wifi-good.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
+    let wifi_medium_handle = svg::Handle::from_path(format!(
+        "{}/resources/wifi-medium.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
+    let wifi_bad_handle = svg::Handle::from_path(format!(
+        "{}/resources/wifi-bad.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
 
     let audio_handle = svg::Handle::from_path(format!(
         "{}/resources/speaker.svg",
@@ -94,19 +131,22 @@ fn init() -> (State, Task<Message>) {
     ));
 
     let display = Display {
-        wifi_str: "-".into(),
+        network: Network::default(),
         audio_str: "-".into(),
         power_str: "-".into(),
         workspaces: Workspaces {
-            count: 2,
+            count: 1,
             current: 1,
         },
         date_time: Local::now(),
-        delta_ms: 1000,
+        // Every 5 sec wifi is updated so start with 5 sec offset to immediately update
+        delta_ms: 5000,
     };
 
     let state = State {
-        wifi_handle,
+        wifi_good_handle,
+        wifi_medium_handle,
+        wifi_bad_handle,
         audio_handle,
         power_handle,
         display,
@@ -125,7 +165,7 @@ fn app_style(_state: &State, _theme: &iced::Theme) -> theme::Style {
 fn update(state: &mut State, message: Message) -> Task<Message> {
     let current_ms = state.display.delta_ms;
     let current_workspaces = state.display.workspaces;
-    let current_wifi_str = state.display.wifi_str.clone();
+    let current_network = state.display.network.clone();
 
     match message {
         Message::Tick(instant) => Task::future(async move {
@@ -133,11 +173,11 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
 
             let mut delta_ms = current_ms + elapsed_ms;
 
-            let wifi_str = if 1000 < delta_ms {
-                delta_ms -= 1000;
-                get_wifi_str().await.unwrap_or("? WiFi".into())
+            let network = if 5000 < delta_ms {
+                delta_ms -= 5000;
+                get_network().await.unwrap_or(current_network)
             } else {
-                current_wifi_str
+                current_network
             };
 
             let display = Display {
@@ -147,7 +187,7 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
                 workspaces: get_current_workspace(current_workspaces)
                     .await
                     .unwrap_or(current_workspaces),
-                wifi_str,
+                network,
                 delta_ms,
             };
 
@@ -235,29 +275,37 @@ async fn get_current_workspace(current_workspaces: Workspaces) -> tokio::io::Res
     Ok(workspaces)
 }
 
-async fn get_wifi_str() -> io::Result<String> {
-    let mut wifi = Command::new("iwctl")
+async fn get_network() -> io::Result<Network> {
+    let wifi = Command::new("iwctl")
         .args(["station", "wlan0", "show"])
-        .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .spawn()?;
+        .output()
+        .await?;
 
-    let wifi_out: Stdio = wifi
-        .stdout
-        .take()
-        .unwrap()
-        .try_into()
-        .expect("failed to convert to Stdio");
+    let mut network = Network {
+        ssid: "-".into(),
+        strength: WifiStrength::Medium,
+    };
 
-    let rg = Command::new("rg")
-        .args(["Connected network", "-r", "$1"])
-        .stdin(wifi_out) // Pipe ls_output to grep's stdin
-        .stdout(Stdio::piped())
-        .spawn()?;
+    for line in String::from_utf8_lossy(&wifi.stdout).trim().lines() {
+        if let Some(ssid) = line.split("Connected network").nth(1) {
+            network.ssid = ssid.trim().to_string();
+        } else if let Some(dbms) = line.split("AverageRSSI").nth(1) {
+            network.strength = dbms
+                .trim()
+                .split_whitespace()
+                .nth(0)
+                .map(|str| match str.parse::<i32>() {
+                    Ok(n) if n <= 60 => WifiStrength::Excellent,
+                    Ok(n) if n <= 67 => WifiStrength::Good,
+                    Ok(n) if n <= 75 => WifiStrength::Medium,
+                    _ => WifiStrength::Bad,
+                })
+                .unwrap_or(WifiStrength::Medium)
+        }
+    }
 
-    let output = rg.wait_with_output().await?;
-
-    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    Ok(network)
 }
 
 async fn get_audio_str() -> io::Result<String> {
@@ -342,7 +390,8 @@ fn workspaces(state: &State) -> Element<'_, Message> {
                 },
                 ..Default::default()
             })
-            .on_press(Message::OpenOverview).into()
+            .on_press(Message::OpenOverview)
+            .into(),
     ];
 
     for i in 1..=state.display.workspaces.count {
@@ -351,7 +400,7 @@ fn workspaces(state: &State) -> Element<'_, Message> {
                 .on_press(Message::SetWorkspace(i))
                 .style(move |_theme, _status| button_style(i))
                 .width(Length::Shrink)
-                .into()
+                .into(),
         );
     }
 
@@ -385,13 +434,20 @@ fn time_date(state: &State) -> Element<'_, Message> {
 fn info(state: &State) -> Element<'_, Message> {
     let display = &state.display;
 
+    let wifi_handle = match display.network.strength {
+        WifiStrength::Excellent => state.wifi_good_handle.clone(),
+        WifiStrength::Good => state.wifi_good_handle.clone(),
+        WifiStrength::Medium => state.wifi_medium_handle.clone(),
+        WifiStrength::Bad => state.wifi_bad_handle.clone(),
+    };
+
     container(
         row![
             module(row![
-                svg(state.wifi_handle.clone())
+                svg(wifi_handle)
                     .width(SVG_SIZE)
                     .height(SVG_SIZE),
-                text(&display.wifi_str)
+                text(&display.network.ssid)
             ]),
             module_button(row![
                 svg(state.audio_handle.clone())

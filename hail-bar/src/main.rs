@@ -2,7 +2,7 @@ use chrono::{DateTime, Local};
 use iced::border::Radius;
 use iced::futures::io;
 use iced::time::milliseconds;
-use iced::widget::{Button, Container, button, container, row, svg, text};
+use iced::widget::{button, container, row, svg, text, Button, Container, Row};
 use iced::{
     Alignment, Background, Border, Color, Element, Length, Subscription, Task, padding, theme,
 };
@@ -26,6 +26,12 @@ enum Message {
     NoOp,
 }
 
+#[derive(Debug, Clone, Copy)]
+struct Workspaces {
+    count: u32,
+    current: u32,
+}
+
 #[derive(Debug)]
 struct State {
     wifi_handle: svg::Handle,
@@ -39,7 +45,7 @@ struct Display {
     wifi_str: String,
     audio_str: String,
     power_str: String,
-    current_workspace: u32,
+    workspaces: Workspaces,
     date_time: DateTime<Local>,
     delta_ms: u64,
 }
@@ -91,7 +97,10 @@ fn init() -> (State, Task<Message>) {
         wifi_str: "-".into(),
         audio_str: "-".into(),
         power_str: "-".into(),
-        current_workspace: 1,
+        workspaces: Workspaces {
+            count: 2,
+            current: 1,
+        },
         date_time: Local::now(),
         delta_ms: 1000,
     };
@@ -115,7 +124,7 @@ fn app_style(_state: &State, _theme: &iced::Theme) -> theme::Style {
 
 fn update(state: &mut State, message: Message) -> Task<Message> {
     let current_ms = state.display.delta_ms;
-    let current_ws = state.display.current_workspace;
+    let current_workspaces = state.display.workspaces;
     let current_wifi_str = state.display.wifi_str.clone();
 
     match message {
@@ -135,7 +144,9 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
                 date_time: Local::now(),
                 audio_str: get_audio_str().await.unwrap_or("? audio".into()),
                 power_str: get_power_str().await.unwrap_or("? battery".into()),
-                current_workspace: get_current_workspace(current_ws).await.unwrap_or(1),
+                workspaces: get_current_workspace(current_workspaces)
+                    .await
+                    .unwrap_or(current_workspaces),
                 wifi_str,
                 delta_ms,
             };
@@ -193,23 +204,35 @@ async fn set_workspace(index: u32) -> tokio::io::Result<()> {
     Ok(())
 }
 
-async fn get_current_workspace(mut current_ws: u32) -> tokio::io::Result<u32> {
+async fn get_current_workspace(current_workspaces: Workspaces) -> tokio::io::Result<Workspaces> {
     let niri = Command::new("niri")
         .args(["msg", "workspaces"])
         .stdout(Stdio::piped())
         .output()
         .await?;
 
-    for line in String::from_utf8_lossy(&niri.stdout).lines() {
+    let mut workspaces = Workspaces {
+        current: current_workspaces.current,
+        count: 0,
+    };
+
+    for (i, line) in String::from_utf8_lossy(&niri.stdout).lines().enumerate() {
+        if i == 0 {
+            continue;
+        }
+
+        workspaces.count += 1;
+
         if line.contains("*") {
-            current_ws = line.split_whitespace()
+            workspaces.current = line
+                .split_whitespace()
                 .last()
                 .and_then(|word| word.trim().parse().ok())
-                .unwrap_or(1)
+                .unwrap_or(1);
         }
     }
 
-    Ok(current_ws)
+    Ok(workspaces)
 }
 
 async fn get_wifi_str() -> io::Result<String> {
@@ -284,7 +307,7 @@ fn workspaces(state: &State) -> Element<'_, Message> {
     ));
 
     let button_style = |btn_ws_index: u32| -> button::Style {
-        if display.current_workspace == btn_ws_index {
+        if display.workspaces.current == btn_ws_index {
             button::Style {
                 background: Some(Color::from_rgb8(0, 167, 119).into()),
                 border: Border {
@@ -308,35 +331,35 @@ fn workspaces(state: &State) -> Element<'_, Message> {
         }
     };
 
+    let mut buttons: Vec<Element<'_, Message>> = vec![
+        button(svg(binoculars_handle).width(24).height(32))
+            .style(|_, _| button::Style {
+                background: Some(Color::from_rgb8(0, 167, 119).into()),
+                border: Border {
+                    color: Color::BLACK,
+                    width: 2.,
+                    radius: Radius::new(5),
+                },
+                ..Default::default()
+            })
+            .on_press(Message::OpenOverview).into()
+    ];
+
+    for i in 1..=state.display.workspaces.count {
+        buttons.push(
+            button(text(i.to_string()))
+                .on_press(Message::SetWorkspace(i))
+                .style(move |_theme, _status| button_style(i))
+                .width(Length::Shrink)
+                .into()
+        );
+    }
+
     container(
-        row![
-            button(svg(binoculars_handle).width(24).height(32))
-                .style(|_, _| button::Style {
-                    background: Some(Color::from_rgb8(0, 167, 119).into()),
-                    border: Border {
-                        color: Color::BLACK,
-                        width: 2.,
-                        radius: Radius::new(5),
-                    },
-                    ..Default::default()
-                })
-                .on_press(Message::OpenOverview),
-            button("1")
-                .on_press(Message::SetWorkspace(1))
-                .style(move |_theme, _status| button_style(1))
-                .width(Length::Shrink),
-            button("2")
-                .on_press(Message::SetWorkspace(2))
-                .style(move |_theme, _status| button_style(2))
-                .width(Length::Shrink),
-            button("3")
-                .on_press(Message::SetWorkspace(3))
-                .style(move |_theme, _status| button_style(3))
-                .width(Length::Shrink),
-        ]
-        .align_y(Alignment::Center)
-        .height(32)
-        .spacing(5),
+        Row::with_children(buttons)
+            .align_y(Alignment::Center)
+            .height(32)
+            .spacing(5),
     )
     .align_x(Alignment::Start)
     .width(Length::Fill)

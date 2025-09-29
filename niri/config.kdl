@@ -365,6 +365,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     Mod+M { spawn-sh "makoctl dismiss --all"; }
+    Mod+N { spawn-sh "makoctl restore"; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+B hotkey-overlay-title="Open the browser: brave" { spawn "brave"; }

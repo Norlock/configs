@@ -10,3 +10,4 @@ border-radius=8
 icon-path=/usr/share/icons/breeze-dark/
 actions=1
 default-timeout=8000
+max-history=10

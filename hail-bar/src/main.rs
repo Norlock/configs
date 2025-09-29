@@ -65,6 +65,7 @@ struct State {
     audio_handle: svg::Handle,
     power_handle: svg::Handle,
     binoculars_handle: svg::Handle,
+    clock_handle: svg::Handle,
     display: Display,
 }
 
@@ -138,6 +139,11 @@ fn init() -> (State, Task<Message>) {
         env!("CARGO_MANIFEST_DIR")
     ));
 
+    let clock_handle = svg::Handle::from_path(format!(
+        "{}/resources/clock.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
     let display = Display {
         network: Network::default(),
         audio_str: "-".into(),
@@ -158,6 +164,7 @@ fn init() -> (State, Task<Message>) {
         audio_handle,
         power_handle,
         binoculars_handle,
+        clock_handle,
         display,
     };
 
@@ -421,13 +428,35 @@ fn workspaces(state: &State) -> Element<'_, Message> {
 fn time_date(state: &State) -> Element<'_, Message> {
     let formatted = format!("{}", state.display.date_time.format("%d/%m/%Y %H:%M"));
 
-    container(row![
-        text(formatted)
-            .align_y(Alignment::Center)
-            .height(32)
-            .align_x(Alignment::Center)
-    ])
+    fn module_style(_: &iced::Theme) -> container::Style {
+        container::Style {
+            background: Some(Color::from_rgb8(11, 11, 11).into()),
+            border: Border {
+                color: Color::BLACK,
+                width: 2.,
+                radius: Radius::new(5.),
+            },
+            ..Default::default()
+        }
+    }
+
+    container(
+        row![
+            svg(state.clock_handle.clone())
+                .style(|_, _| {
+                    svg::Style { color: Some(Color::from_rgb8(0, 167, 119)) }
+                })  
+                .width(SVG_SIZE)
+                .height(32),
+            text(formatted)
+                .height(32)
+                .align_y(Alignment::Center)
+                .align_x(Alignment::Center)
+        ]
+        .spacing(10),
+    )
     .align_x(Alignment::Center)
+    .align_y(Alignment::Center)
     .width(Length::Shrink)
     .padding(padding::right(10).left(10))
     .style(module_style)
@@ -495,6 +524,18 @@ fn module_button(row: iced::widget::Row<'_, Message>) -> Button<'_, Message> {
     .style(button_module_style)
 }
 fn module(row: iced::widget::Row<'_, Message>) -> Container<'_, Message> {
+    fn module_style(_: &iced::Theme) -> container::Style {
+        container::Style {
+            background: Some(bg_color()),
+            border: Border {
+                color: Color::BLACK,
+                width: 2.,
+                radius: Radius::new(5.),
+            },
+            ..Default::default()
+        }
+    }
+
     container(
         row.spacing(10)
             .width(Length::Shrink)
@@ -509,18 +550,6 @@ fn module(row: iced::widget::Row<'_, Message>) -> Container<'_, Message> {
 fn button_module_style(_: &iced::Theme, _: button::Status) -> button::Style {
     button::Style {
         text_color: Color::WHITE,
-        background: Some(bg_color()),
-        border: Border {
-            color: Color::BLACK,
-            width: 2.,
-            radius: Radius::new(5.),
-        },
-        ..Default::default()
-    }
-}
-
-fn module_style(_: &iced::Theme) -> container::Style {
-    container::Style {
         background: Some(bg_color()),
         border: Border {
             color: Color::BLACK,

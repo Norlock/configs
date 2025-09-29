@@ -304,8 +304,8 @@ async fn get_network() -> io::Result<Network> {
                 .next()
                 .map(|str| match str.trim().parse::<i32>().map(|i| i.abs()) {
                     Ok(n) if n <= 60 => WifiStrength::Excellent,
-                    Ok(n) if n <= 67 => WifiStrength::Good,
-                    Ok(n) if n <= 75 => WifiStrength::Medium,
+                    Ok(n) if n <= 70 => WifiStrength::Good,
+                    Ok(n) if n <= 80 => WifiStrength::Medium,
                     _ => WifiStrength::Bad,
                 })
                 .unwrap_or(WifiStrength::Medium)

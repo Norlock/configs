@@ -14,6 +14,8 @@ use std::process::Stdio;
 use std::time::Instant;
 use tokio::process::Command;
 
+const UPDATE_WIFI_MS: u64 = 5000;
+
 #[allow(unused)]
 #[to_layer_message]
 #[derive(Debug, Clone)]
@@ -62,6 +64,7 @@ struct State {
     wifi_bad_handle: svg::Handle,
     audio_handle: svg::Handle,
     power_handle: svg::Handle,
+    binoculars_handle: svg::Handle,
     display: Display,
 }
 
@@ -130,6 +133,11 @@ fn init() -> (State, Task<Message>) {
         env!("CARGO_MANIFEST_DIR")
     ));
 
+    let binoculars_handle = svg::Handle::from_path(format!(
+        "{}/resources/binoculars.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
     let display = Display {
         network: Network::default(),
         audio_str: "-".into(),
@@ -140,7 +148,7 @@ fn init() -> (State, Task<Message>) {
         },
         date_time: Local::now(),
         // Every 5 sec wifi is updated so start with 5 sec offset to immediately update
-        delta_ms: 5000,
+        delta_ms: UPDATE_WIFI_MS,
     };
 
     let state = State {
@@ -149,6 +157,7 @@ fn init() -> (State, Task<Message>) {
         wifi_bad_handle,
         audio_handle,
         power_handle,
+        binoculars_handle,
         display,
     };
 
@@ -169,12 +178,11 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
 
     match message {
         Message::Tick(instant) => Task::future(async move {
-            let elapsed_ms: u64 = instant.elapsed().as_millis().try_into().unwrap();
-
+            let elapsed_ms: u64 = instant.elapsed().as_millis() as u64;
             let mut delta_ms = current_ms + elapsed_ms;
 
-            let network = if 5000 < delta_ms {
-                delta_ms -= 5000;
+            let network = if UPDATE_WIFI_MS < delta_ms {
+                delta_ms = 0;
                 get_network().await.unwrap_or(current_network)
             } else {
                 current_network
@@ -292,10 +300,9 @@ async fn get_network() -> io::Result<Network> {
             network.ssid = ssid.trim().to_string();
         } else if let Some(dbms) = line.split("AverageRSSI").nth(1) {
             network.strength = dbms
-                .trim()
                 .split_whitespace()
-                .nth(0)
-                .map(|str| match str.parse::<i32>() {
+                .next()
+                .map(|str| match str.trim().parse::<i32>().map(|i| i.abs()) {
                     Ok(n) if n <= 60 => WifiStrength::Excellent,
                     Ok(n) if n <= 67 => WifiStrength::Good,
                     Ok(n) if n <= 75 => WifiStrength::Medium,
@@ -349,10 +356,6 @@ fn outer(elem: Element<'_, Message>) -> Container<'_, Message> {
 
 fn workspaces(state: &State) -> Element<'_, Message> {
     let display = &state.display;
-    let binoculars_handle = svg::Handle::from_path(format!(
-        "{}/resources/binoculars.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
 
     let button_style = |btn_ws_index: u32| -> button::Style {
         if display.workspaces.current == btn_ws_index {
@@ -380,7 +383,7 @@ fn workspaces(state: &State) -> Element<'_, Message> {
     };
 
     let mut buttons: Vec<Element<'_, Message>> = vec![
-        button(svg(binoculars_handle).width(24).height(32))
+        button(svg(state.binoculars_handle.clone()).width(24).height(32))
             .style(|_, _| button::Style {
                 background: Some(Color::from_rgb8(0, 167, 119).into()),
                 border: Border {

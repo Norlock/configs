@@ -1,0 +1,12 @@
+font=Fira Sans
+background-color=#222222
+progress-color=#444444
+icons=1
+padding=10
+width=400
+border-color=#dddddd
+border-size=3
+border-radius=8
+icon-path=/usr/share/icons/breeze-dark/
+actions=1
+default-timeout=8000

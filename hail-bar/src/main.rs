@@ -48,6 +48,12 @@ struct Network {
     strength: WifiStrength,
 }
 
+#[derive(Debug, Clone)]
+struct Audio {
+    volume: String,
+    is_muted: bool,
+}
+
 impl Default for Network {
     fn default() -> Self {
         Self {
@@ -63,6 +69,7 @@ struct State {
     wifi_medium_handle: svg::Handle,
     wifi_bad_handle: svg::Handle,
     audio_handle: svg::Handle,
+    no_audio_handle: svg::Handle,
     power_handle: svg::Handle,
     binoculars_handle: svg::Handle,
     clock_handle: svg::Handle,
@@ -71,7 +78,7 @@ struct State {
 
 #[derive(Debug, Clone)]
 struct Display {
-    audio_str: String,
+    audio: Audio,
     power_str: String,
     workspaces: Workspaces,
     network: Network,
@@ -129,6 +136,11 @@ fn init() -> (State, Task<Message>) {
         env!("CARGO_MANIFEST_DIR")
     ));
 
+    let no_audio_handle = svg::Handle::from_path(format!(
+        "{}/resources/no-audio.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
     let power_handle = svg::Handle::from_path(format!(
         "{}/resources/power.svg",
         env!("CARGO_MANIFEST_DIR")
@@ -146,7 +158,10 @@ fn init() -> (State, Task<Message>) {
 
     let display = Display {
         network: Network::default(),
-        audio_str: "-".into(),
+        audio: Audio {
+            volume: "-".into(),
+            is_muted: false,
+        },
         power_str: "-".into(),
         workspaces: Workspaces {
             count: 1,
@@ -162,6 +177,7 @@ fn init() -> (State, Task<Message>) {
         wifi_medium_handle,
         wifi_bad_handle,
         audio_handle,
+        no_audio_handle,
         power_handle,
         binoculars_handle,
         clock_handle,
@@ -182,6 +198,7 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
     let current_ms = state.display.delta_ms;
     let current_workspaces = state.display.workspaces;
     let current_network = state.display.network.clone();
+    let current_audio = state.display.audio.clone();
 
     match message {
         Message::Tick(instant) => Task::future(async move {
@@ -197,7 +214,7 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
 
             let display = Display {
                 date_time: Local::now(),
-                audio_str: get_audio_str().await.unwrap_or("? audio".into()),
+                audio: get_audio().await.unwrap_or(current_audio),
                 power_str: get_power_str().await.unwrap_or("? battery".into()),
                 workspaces: get_current_workspace(current_workspaces)
                     .await
@@ -322,14 +339,24 @@ async fn get_network() -> io::Result<Network> {
     Ok(network)
 }
 
-async fn get_audio_str() -> io::Result<String> {
+async fn get_audio() -> io::Result<Audio> {
     let pamixer = Command::new("pamixer")
         .arg("--get-volume")
         .stdout(Stdio::piped())
         .output()
         .await?;
 
-    Ok(String::from_utf8_lossy(&pamixer.stdout).trim().to_string())
+    let display = String::from_utf8_lossy(&pamixer.stdout).trim().to_string();
+
+    let pamixer = Command::new("pamixer")
+        .arg("--get-mute")
+        .stdout(Stdio::piped())
+        .output()
+        .await?;
+
+    let is_muted = String::from_utf8_lossy(&pamixer.stdout).trim() == "true";
+
+    Ok(Audio { volume: display, is_muted })
 }
 
 async fn get_power_str() -> io::Result<String> {
@@ -444,8 +471,10 @@ fn time_date(state: &State) -> Element<'_, Message> {
         row![
             svg(state.clock_handle.clone())
                 .style(|_, _| {
-                    svg::Style { color: Some(Color::from_rgb8(0, 167, 119)) }
-                })  
+                    svg::Style {
+                        color: Some(Color::from_rgb8(0, 167, 119)),
+                    }
+                })
                 .width(SVG_SIZE)
                 .height(32),
             text(formatted)
@@ -492,10 +521,16 @@ fn info(state: &State) -> Element<'_, Message> {
                 text(&display.network.ssid)
             ]),
             module_button(row![
-                svg(state.audio_handle.clone())
-                    .width(SVG_SIZE)
-                    .height(SVG_SIZE),
-                text(&display.audio_str)
+                if display.audio.is_muted {
+                    svg(state.no_audio_handle.clone())
+                        .width(SVG_SIZE)
+                        .height(SVG_SIZE)
+                } else {
+                    svg(state.audio_handle.clone())
+                        .width(SVG_SIZE)
+                        .height(SVG_SIZE)
+                },
+                text(&display.audio.volume)
             ])
             .on_press(Message::OpenPavucontrol),
             module(row![

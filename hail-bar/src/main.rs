@@ -1,4 +1,6 @@
 use chrono::{DateTime, Local};
+use core::num;
+use core::option::Option::Some;
 use iced::border::Radius;
 use iced::futures::io;
 use iced::time::milliseconds;
@@ -40,6 +42,7 @@ enum WifiStrength {
     Good,
     Medium,
     Bad,
+    NoWifi,
 }
 
 #[derive(Debug, Clone)]
@@ -68,11 +71,13 @@ struct State {
     wifi_good_handle: svg::Handle,
     wifi_medium_handle: svg::Handle,
     wifi_bad_handle: svg::Handle,
+    wifi_none_handle: svg::Handle,
     audio_handle: svg::Handle,
     no_audio_handle: svg::Handle,
     power_handle: svg::Handle,
     binoculars_handle: svg::Handle,
     clock_handle: svg::Handle,
+    brightness_handle: svg::Handle,
     display: Display,
 }
 
@@ -83,6 +88,7 @@ struct Display {
     workspaces: Workspaces,
     network: Network,
     date_time: DateTime<Local>,
+    brightness: String,
     delta_ms: u64,
 }
 
@@ -131,6 +137,11 @@ fn init() -> (State, Task<Message>) {
         env!("CARGO_MANIFEST_DIR")
     ));
 
+    let wifi_none_handle = svg::Handle::from_path(format!(
+        "{}/resources/wifi-none.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
     let audio_handle = svg::Handle::from_path(format!(
         "{}/resources/speaker.svg",
         env!("CARGO_MANIFEST_DIR")
@@ -156,6 +167,11 @@ fn init() -> (State, Task<Message>) {
         env!("CARGO_MANIFEST_DIR")
     ));
 
+    let brightness_handle = svg::Handle::from_path(format!(
+        "{}/resources/brightness.svg",
+        env!("CARGO_MANIFEST_DIR")
+    ));
+
     let display = Display {
         network: Network::default(),
         audio: Audio {
@@ -170,17 +186,20 @@ fn init() -> (State, Task<Message>) {
         date_time: Local::now(),
         // Every 5 sec wifi is updated so start with 5 sec offset to immediately update
         delta_ms: UPDATE_WIFI_MS,
+        brightness: "100%".into(),
     };
 
     let state = State {
         wifi_good_handle,
         wifi_medium_handle,
         wifi_bad_handle,
+        wifi_none_handle,
         audio_handle,
         no_audio_handle,
         power_handle,
         binoculars_handle,
         clock_handle,
+        brightness_handle,
         display,
     };
 
@@ -199,6 +218,7 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
     let current_workspaces = state.display.workspaces;
     let current_network = state.display.network.clone();
     let current_audio = state.display.audio.clone();
+    let current_brightness = state.display.brightness.clone();
 
     match message {
         Message::Tick(instant) => Task::future(async move {
@@ -219,6 +239,7 @@ fn update(state: &mut State, message: Message) -> Task<Message> {
                 workspaces: get_current_workspace(current_workspaces)
                     .await
                     .unwrap_or(current_workspaces),
+                brightness: get_brightness().await.unwrap_or(current_brightness),
                 network,
                 delta_ms,
             };
@@ -333,10 +354,35 @@ async fn get_network() -> io::Result<Network> {
                     _ => WifiStrength::Bad,
                 })
                 .unwrap_or(WifiStrength::Medium)
+        } else if let Some("disconnected") = line.split("State").nth(1).map(|s| s.trim()) {
+            network.strength = WifiStrength::NoWifi
         }
     }
 
     Ok(network)
+}
+
+async fn get_brightness() -> io::Result<String> {
+    let brightness = Command::new("brightnessctl")
+        .args(["--machine-readable"])
+        .stdout(Stdio::piped())
+        .output()
+        .await?;
+
+    if let Some(line) = String::from_utf8_lossy(&brightness.stdout)
+        .trim()
+        .lines()
+        .next()
+    {
+        if let Some(brightness_percentage) = line.split(',').nth(3) {
+            return Ok(brightness_percentage.to_string());
+        }
+    }
+
+    Err(io::Error::new(
+        std::io::ErrorKind::InvalidData,
+        "No brightness data found".to_string(),
+    ))
 }
 
 async fn get_audio() -> io::Result<Audio> {
@@ -356,7 +402,10 @@ async fn get_audio() -> io::Result<Audio> {
 
     let is_muted = String::from_utf8_lossy(&pamixer.stdout).trim() == "true";
 
-    Ok(Audio { volume: display, is_muted })
+    Ok(Audio {
+        volume: display,
+        is_muted,
+    })
 }
 
 async fn get_power_str() -> io::Result<String> {
@@ -509,6 +558,10 @@ fn info(state: &State) -> Element<'_, Message> {
             Color::from_rgb8(255, 193, 7),
         ),
         WifiStrength::Bad => (state.wifi_bad_handle.clone(), Color::from_rgb8(244, 67, 54)),
+        WifiStrength::NoWifi => (
+            state.wifi_none_handle.clone(),
+            Color::from_rgb8(245, 73, 39),
+        ),
     };
 
     container(
@@ -519,6 +572,12 @@ fn info(state: &State) -> Element<'_, Message> {
                     .width(SVG_SIZE)
                     .height(SVG_SIZE),
                 text(&display.network.ssid)
+            ]),
+            module(row![
+                svg(state.brightness_handle.clone())
+                    .width(SVG_SIZE)
+                    .height(SVG_SIZE),
+                text(&display.brightness)
             ]),
             module_button(row![
                 if display.audio.is_muted {

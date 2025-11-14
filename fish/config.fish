@@ -7,14 +7,14 @@ set -gx QT_QPA_PLATFORM wayland
 set -gx EDITOR nvim
 set -gx TERM ghostty
 set -gx GPG_TTY (tty)
-#set -gx BROWSER brave
-#set -gx XDG_RUNTIME_DIR ~/.config
+set -gx BROWSER zen-browser
 
 set -gx GEM_HOME ~/.ruby 
 set -x PATH $PATH ~/.cargo/bin
 set -x PATH $PATH ~/.local/bin
 set -x PATH $PATH /usr/sbin
 set -x PATH $PATH ~/.nodemodules/bin
+set -x PATH $PATH $BUN_INSTALL/bin 
 
 # Setting fd as the default source for fzf
 set -gx FZF_DEFAULT_COMMAND "fd --type f"
@@ -62,5 +62,4 @@ alias cat='bat --decorations never'
 zoxide init fish | source
 
 # bun
-set --export BUN_INSTALL "$HOME/.bun"
-set --export PATH $BUN_INSTALL/bin $PATH
+set -x BUN_INSTALL "$HOME/.bun"

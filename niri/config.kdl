@@ -66,7 +66,7 @@ input {
 
     // Focus windows and outputs automatically when moving the mouse into them.
     // Setting max-scroll-amount="0%" makes it work only on windows already fully on screen.
-    // focus-follows-mouse max-scroll-amount="0%"
+    focus-follows-mouse max-scroll-amount="0%"
 }
 
 gestures {
@@ -81,7 +81,7 @@ gestures {
 // Find more information on the wiki:
 // https://yalter.github.io/niri/Configuration:-Outputs
 // Remember to uncomment the node by removing "/-"!
-/-output "eDP-1" {
+output "eDP-1" {
     // Uncomment this line to disable this output.
     // off
 
@@ -91,7 +91,7 @@ gestures {
     // for the resolution.
     // If the mode is omitted altogether or is invalid, niri will pick one automatically.
     // Run `niri msg outputs` while inside a niri instance to list all outputs and their modes.
-    mode "1920x1080@120.030"
+    mode "3840x2400@60"
 
     // You can use integer or fractional scale, for example use 1.5 for 150% scale.
     scale 2
@@ -109,7 +109,17 @@ gestures {
     // so to put another output directly adjacent to it on the right, set its x to 1920.
     // If the position is unset or results in an overlap, the output is instead placed
     // automatically.
-    position x=1280 y=0
+    position x=0 y=0
+}
+
+output "HDMI-A-1" {
+    mode "2560x1440@143.996"
+
+    scale 1.33
+
+    transform "normal"
+
+    position x=1920 y=0
 }
 
 // Settings that influence how windows are positioned and sized.
@@ -144,7 +154,7 @@ layout {
     // preset-window-heights { }
 
     // You can change the default width of the new windows.
-    default-column-width { proportion 1.0; }
+    default-column-width { proportion 0.75; }
     // If you leave the brackets empty, the windows themselves will decide their initial width.
     // default-column-width {}
 
@@ -374,7 +384,7 @@ binds {
     Mod+N { spawn-sh "makoctl restore"; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+B hotkey-overlay-title="Open the browser: brave" { spawn "brave"; }
+    Mod+B hotkey-overlay-title="Open the browser: " { spawn "brave"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }

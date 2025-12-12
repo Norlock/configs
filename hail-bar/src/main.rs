@@ -99,167 +99,183 @@ fn bg_color() -> Background {
 }
 
 fn main() -> iced_layershell::Result {
-    application(init, namespace, update, view)
+    application(State::init, State::namespace, State::update, State::view)
         .layer_settings(LayerShellSettings {
-            size: Some((1920, 32)),
             anchor: Anchor::Bottom | Anchor::Left | Anchor::Right,
-            margin: (0, 10, 5, 10),
             layer: Layer::Top,
             exclusive_zone: 28,
+            size: Some((1920, 32)),
+            margin: (0, 10, 5, 10),
             ..Default::default()
         })
         .subscription(subscriptions)
-        .style(app_style)
+        .style(State::app_style)
         .run()
-
-    
 }
 
 fn subscriptions(_state: &State) -> Subscription<Message> {
     iced::time::every(milliseconds(64)).map(Message::Tick)
 }
 
-fn namespace() -> String {
-    "Hail bar".to_string()
-}
+impl State {
+    fn init() -> (Self, Task<Message>) {
+        let wifi_good_handle = svg::Handle::from_path(format!(
+            "{}/resources/wifi-good.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-fn init() -> (State, Task<Message>) {
-    let wifi_good_handle = svg::Handle::from_path(format!(
-        "{}/resources/wifi-good.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let wifi_medium_handle = svg::Handle::from_path(format!(
+            "{}/resources/wifi-medium.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let wifi_medium_handle = svg::Handle::from_path(format!(
-        "{}/resources/wifi-medium.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let wifi_bad_handle = svg::Handle::from_path(format!(
+            "{}/resources/wifi-bad.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let wifi_bad_handle = svg::Handle::from_path(format!(
-        "{}/resources/wifi-bad.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let wifi_none_handle = svg::Handle::from_path(format!(
+            "{}/resources/wifi-none.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let wifi_none_handle = svg::Handle::from_path(format!(
-        "{}/resources/wifi-none.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let audio_handle = svg::Handle::from_path(format!(
+            "{}/resources/speaker.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let audio_handle = svg::Handle::from_path(format!(
-        "{}/resources/speaker.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let no_audio_handle = svg::Handle::from_path(format!(
+            "{}/resources/no-audio.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let no_audio_handle = svg::Handle::from_path(format!(
-        "{}/resources/no-audio.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let power_handle = svg::Handle::from_path(format!(
+            "{}/resources/power.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let power_handle = svg::Handle::from_path(format!(
-        "{}/resources/power.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let binoculars_handle = svg::Handle::from_path(format!(
+            "{}/resources/binoculars.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let binoculars_handle = svg::Handle::from_path(format!(
-        "{}/resources/binoculars.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let clock_handle = svg::Handle::from_path(format!(
+            "{}/resources/clock.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let clock_handle = svg::Handle::from_path(format!(
-        "{}/resources/clock.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let brightness_handle = svg::Handle::from_path(format!(
+            "{}/resources/brightness.svg",
+            env!("CARGO_MANIFEST_DIR")
+        ));
 
-    let brightness_handle = svg::Handle::from_path(format!(
-        "{}/resources/brightness.svg",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+        let display = Display {
+            network: Network::default(),
+            audio: Audio {
+                volume: "-".into(),
+                is_muted: false,
+            },
+            power_str: "-".into(),
+            monitors: vec![],
+            date_time: Local::now(),
+            // Every 5 sec wifi is updated so start with 5 sec offset to immediately update
+            delta_ms: UPDATE_WIFI_MS,
+            brightness: "100%".into(),
+        };
 
-    let display = Display {
-        network: Network::default(),
-        audio: Audio {
-            volume: "-".into(),
-            is_muted: false,
-        },
-        power_str: "-".into(),
-        monitors: vec![],
-        date_time: Local::now(),
-        // Every 5 sec wifi is updated so start with 5 sec offset to immediately update
-        delta_ms: UPDATE_WIFI_MS,
-        brightness: "100%".into(),
-    };
+        let state = State {
+            wifi_good_handle,
+            wifi_medium_handle,
+            wifi_bad_handle,
+            wifi_none_handle,
+            audio_handle,
+            no_audio_handle,
+            power_handle,
+            binoculars_handle,
+            clock_handle,
+            brightness_handle,
+            display,
+        };
 
-    let state = State {
-        wifi_good_handle,
-        wifi_medium_handle,
-        wifi_bad_handle,
-        wifi_none_handle,
-        audio_handle,
-        no_audio_handle,
-        power_handle,
-        binoculars_handle,
-        clock_handle,
-        brightness_handle,
-        display,
-    };
-
-    (state, Task::none())
-}
-
-fn app_style(_state: &State, _theme: &iced::Theme) -> theme::Style {
-    theme::Style {
-        background_color: Color::TRANSPARENT,
-        text_color: Color::WHITE,
+        (state, Task::none())
     }
-}
 
-fn update(state: &mut State, message: Message) -> Task<Message> {
-    let current_ms = state.display.delta_ms;
-    let current_network = state.display.network.clone();
-    let current_audio = state.display.audio.clone();
+    fn namespace() -> String {
+        "Hail bar".to_string()
+    }
 
-    match message {
-        Message::Tick(instant) => Task::future(async move {
-            let elapsed_ms: u64 = instant.elapsed().as_millis() as u64;
-            let mut delta_ms = current_ms + elapsed_ms;
+    fn update(&mut self, message: Message) -> Task<Message> {
+        let current_ms = self.display.delta_ms;
+        let current_network = self.display.network.clone();
+        let current_audio = self.display.audio.clone();
 
-            let network = if UPDATE_WIFI_MS < delta_ms {
-                delta_ms = 0;
-                get_network().await.unwrap_or(current_network)
-            } else {
-                current_network
-            };
+        match message {
+            Message::Tick(instant) => Task::future(async move {
+                let elapsed_ms: u64 = instant.elapsed().as_millis() as u64;
+                let mut delta_ms = current_ms + elapsed_ms;
 
-            let display = Display {
-                date_time: Local::now(),
-                audio: get_audio().await.unwrap_or(current_audio),
-                power_str: get_power_str().await.unwrap_or("? battery".into()),
-                monitors: get_monitors().await.unwrap_or_default(),
-                brightness: get_brightness().await.unwrap_or("? brightness".into()),
-                network,
-                delta_ms,
-            };
+                let network = if UPDATE_WIFI_MS < delta_ms {
+                    delta_ms = 0;
+                    get_network().await.unwrap_or(current_network)
+                } else {
+                    current_network
+                };
 
-            Message::SetDisplay(display)
-        }),
-        Message::SetWorkspace(monitor_id, ws_index) => Task::future(async move {
-            let _ = set_workspace(monitor_id, ws_index).await;
-            Message::NoOp
-        }),
-        Message::OpenOverview => Task::future(async {
-            let _ = open_overview().await;
-            Message::NoOp
-        }),
-        Message::OpenPavucontrol => Task::future(async {
-            let _ = open_pavucontrol().await;
-            Message::NoOp
-        }),
-        Message::SetDisplay(display) => {
-            state.display = display;
+                let display = Display {
+                    date_time: Local::now(),
+                    audio: get_audio().await.unwrap_or(current_audio),
+                    power_str: get_power_str().await.unwrap_or("? battery".into()),
+                    monitors: get_monitors().await.unwrap_or_default(),
+                    brightness: get_brightness().await.unwrap_or("? brightness".into()),
+                    network,
+                    delta_ms,
+                };
 
-            Task::none()
+                Message::SetDisplay(display)
+            }),
+            Message::SetWorkspace(monitor_id, ws_index) => Task::future(async move {
+                let _ = set_workspace(monitor_id, ws_index).await;
+                Message::NoOp
+            }),
+            Message::OpenOverview => Task::future(async {
+                let _ = open_overview().await;
+                Message::NoOp
+            }),
+            Message::OpenPavucontrol => Task::future(async {
+                let _ = open_pavucontrol().await;
+                Message::NoOp
+            }),
+            Message::SetDisplay(display) => {
+                self.display = display;
+
+                Task::none()
+            }
+            Message::NoOp => Task::none(),
+            _ => panic!("Not implemented"),
         }
-        Message::NoOp => Task::none(),
-        _ => panic!("Not implemented"),
+    }
+
+    fn view(&self) -> Element<'_, Message> {
+        container(
+            row![
+                outer(workspaces_view(self)).align_x(Alignment::Start),
+                outer(time_date_view(self)).align_x(Alignment::Center),
+                outer(info_view(self)).align_x(Alignment::End)
+            ]
+            .width(Length::Fill)
+            .spacing(10),
+        )
+        .center_y(32)
+        .padding(padding::left(5).right(5))
+        .style(style_container)
+        .into()
+    }
+
+    fn app_style(&self, _theme: &iced::Theme) -> theme::Style {
+        theme::Style {
+            background_color: Color::TRANSPARENT,
+            text_color: Color::WHITE,
+        }
     }
 }
 
@@ -433,22 +449,6 @@ async fn get_power_str() -> io::Result<String> {
             .trim()
             .to_string(),
     )
-}
-
-fn view(state: &State) -> Element<'_, Message> {
-    container(
-        row![
-            outer(workspaces_view(state)).align_x(Alignment::Start),
-            outer(time_date_view(state)).align_x(Alignment::Center),
-            outer(info_view(state)).align_x(Alignment::End)
-        ]
-        .width(Length::Fill)
-        .spacing(10),
-    )
-    .center_y(32)
-    .padding(padding::left(5).right(5))
-    .style(style_container)
-    .into()
 }
 
 fn outer(elem: Element<'_, Message>) -> Container<'_, Message> {

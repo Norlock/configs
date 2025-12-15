@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 iced_layershell = { git = "https://github.com/waycrate/exwlshelleventloop", ref = "master" }
-# iced_layershell = { path = "../../exwlshelleventloop" }
-iced = { git = "https://github.com/iced-rs/iced.git", ref = "master", features = ["svg", "tokio"] }
+iced = { version = "0.14.0", features = ["svg", "tokio"] }
 chrono = "0.4.42"
 tokio = { version = "1.48", features = ["fs", "process"] }

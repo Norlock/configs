@@ -7,12 +7,11 @@ set -gx QT_QPA_PLATFORM wayland
 set -gx EDITOR nvim
 set -gx TERM ghostty
 set -gx GPG_TTY (tty)
-set -gx BROWSER brave
+set -gx BROWSER firefox-developer-edition
 
 set -gx GEM_HOME ~/.ruby 
 set -x PATH $PATH ~/.cargo/bin
 set -x PATH $PATH ~/.local/bin
-set -x PATH $PATH /usr/sbin
 set -x PATH $PATH ~/.nodemodules/bin
 set -x PATH $PATH $BUN_INSTALL/bin 
 

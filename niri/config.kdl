@@ -3,6 +3,13 @@
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
 
+workspace "browser"
+workspace "terminal"
+
+environment {
+    MOZ_ENABLE_WAYLAND "1"
+}
+
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://yalter.github.io/niri/Configuration:-Input
@@ -337,13 +344,17 @@ window-rule {
     // }
 }
 
-// Open the Firefox picture-in-picture player as floating by default.
-window-rule {
+/-window-rule {
     // This app-id regular expression will work for both:
     // - host Firefox (app-id is "firefox")
     // - Flatpak Firefox (app-id is "org.mozilla.firefox")
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
-    open-floating true
+    match app-id="^firefox"
+    open-on-workspace "browser"
+}
+
+window-rule {
+    match app-id="brave-browser"
+    open-on-workspace "browser"
 }
 
 // Example: block out two password managers from screen capture.
@@ -358,10 +369,15 @@ window-rule {
     // block-out-from "screencast"
 }
 
+window-rule {
+    match app-id="com.mitchellh.ghostty"
+    open-on-workspace "terminal"
+}
+
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
-/-window-rule {
-    geometry-corner-radius 12
+window-rule {
+    geometry-corner-radius 5
     clip-to-geometry true
 }
 
@@ -384,7 +400,7 @@ binds {
     Mod+N { spawn-sh "makoctl restore"; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+B hotkey-overlay-title="Open the browser: " { spawn "brave"; }
+    Mod+B hotkey-overlay-title="Open the browser: " { spawn "firefox-developer-edition"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
@@ -406,7 +422,7 @@ binds {
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
     // or do a four-finger swipe up on a touchpad.
-    Mod+Shift+Return repeat=false { toggle-overview; }
+    Mod+O repeat=false { toggle-overview; }
 
     Mod+Q repeat=false { close-window; }
 

@@ -1,4 +1,4 @@
 require("global")
-require("config.lazy")
+require("pack")
 require("keymaps")
 require("autocmds")

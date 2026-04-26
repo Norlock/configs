@@ -18,7 +18,8 @@ return {
     gh("ibhagwan/fzf-lua"),
 
     -- autocomplete
-    { src = gh("saghen/blink.cmp"), version = "v1" },
+    -- { src = gh("saghen/blink.cmp"), version = "v1" },
+    { src = gh("saghen/blink.cmp") },
     gh("rafamadriz/friendly-snippets"),
 
     -- comment

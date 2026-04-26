@@ -1,7 +1,6 @@
 use chrono::{DateTime, Local};
 use core::option::Option::Some;
 use iced::border::Radius;
-use iced::futures::io;
 use iced::time::milliseconds;
 use iced::widget::{Button, Container, Row, button, container, row, svg, text};
 use iced::{
@@ -11,7 +10,9 @@ use iced_layershell::build_pattern::application;
 use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::LayerShellSettings;
 use iced_layershell::to_layer_message;
+use std::io;
 use std::process::Stdio;
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use tokio::process::Command;
 
@@ -32,7 +33,7 @@ enum Message {
 #[derive(Debug, Clone)]
 struct Monitor {
     ws_count: u32,
-    current_ws: u32,
+    current_ws: u8,
     id: String,
 }
 
@@ -66,7 +67,8 @@ impl Default for Network {
     }
 }
 
-#[derive(Debug)]
+type SharedSocket = Arc<Mutex<niri_ipc::socket::Socket>>;
+
 struct State {
     wifi_good_handle: svg::Handle,
     wifi_medium_handle: svg::Handle,
@@ -78,6 +80,7 @@ struct State {
     binoculars_handle: svg::Handle,
     clock_handle: svg::Handle,
     brightness_handle: svg::Handle,
+    niri_socket: SharedSocket,
     display: Display,
 }
 
@@ -183,6 +186,10 @@ impl State {
             brightness: "100%".into(),
         };
 
+        let niri_socket = Arc::new(Mutex::new(
+            niri_ipc::socket::Socket::connect().expect("failed to connect to niri socket"),
+        ));
+
         let state = State {
             wifi_good_handle,
             wifi_medium_handle,
@@ -194,6 +201,7 @@ impl State {
             binoculars_handle,
             clock_handle,
             brightness_handle,
+            niri_socket,
             display,
         };
 
@@ -210,37 +218,49 @@ impl State {
         let current_audio = self.display.audio.clone();
 
         match message {
-            Message::Tick(instant) => Task::future(async move {
-                let elapsed_ms: u64 = instant.elapsed().as_millis() as u64;
-                let mut delta_ms = current_ms + elapsed_ms;
+            Message::Tick(instant) => {
+                let socket = self.niri_socket.clone();
 
-                let network = if UPDATE_WIFI_MS < delta_ms {
-                    delta_ms = 0;
-                    get_network().await.unwrap_or(current_network)
-                } else {
-                    current_network
-                };
+                Task::future(async move {
+                    let elapsed_ms: u64 = instant.elapsed().as_millis() as u64;
+                    let mut delta_ms = current_ms + elapsed_ms;
 
-                let display = Display {
-                    date_time: Local::now(),
-                    audio: get_audio().await.unwrap_or(current_audio),
-                    power_str: get_power_str().await.unwrap_or("? battery".into()),
-                    monitors: get_monitors().await.unwrap_or_default(),
-                    brightness: get_brightness().await.unwrap_or("? brightness".into()),
-                    network,
-                    delta_ms,
-                };
+                    let network = if UPDATE_WIFI_MS < delta_ms {
+                        delta_ms = 0;
+                        get_network().await.unwrap_or(current_network)
+                    } else {
+                        current_network
+                    };
 
-                Message::SetDisplay(display)
-            }),
-            Message::SetWorkspace(monitor_id, ws_index) => Task::future(async move {
-                let _ = set_workspace(monitor_id, ws_index).await;
-                Message::NoOp
-            }),
-            Message::OpenOverview => Task::future(async {
-                let _ = open_overview().await;
-                Message::NoOp
-            }),
+                    let display = Display {
+                        date_time: Local::now(),
+                        audio: get_audio().await.unwrap_or(current_audio),
+                        power_str: get_power_str().await.unwrap_or("? battery".into()),
+                        monitors: get_monitors(&socket).unwrap_or_default(),
+                        brightness: get_brightness().await.unwrap_or("? brightness".into()),
+                        network,
+                        delta_ms,
+                    };
+
+                    Message::SetDisplay(display)
+                })
+            }
+            Message::SetWorkspace(monitor_id, ws_index) => {
+                let socket = self.niri_socket.clone();
+
+                Task::future(async move {
+                    let _ = set_workspace(&socket, monitor_id, ws_index);
+                    Message::NoOp
+                })
+            }
+            Message::OpenOverview => {
+                let socket = self.niri_socket.clone();
+
+                Task::future(async move {
+                    let _ = open_overview(&socket);
+                    Message::NoOp
+                })
+            }
             Message::OpenPavucontrol => Task::future(async {
                 let _ = open_pavucontrol().await;
                 Message::NoOp
@@ -288,74 +308,63 @@ async fn open_pavucontrol() -> tokio::io::Result<()> {
     Ok(())
 }
 
-async fn open_overview() -> tokio::io::Result<()> {
-    Command::new("niri")
-        .args(["msg", "action", "toggle-overview"])
-        .stdout(Stdio::null())
-        .output()
-        .await?;
+fn open_overview(socket: &SharedSocket) -> io::Result<()> {
+    let mut s = socket.lock().unwrap();
+
+    let _ = s.send(niri_ipc::Request::Action(
+        niri_ipc::Action::ToggleOverview {},
+    ))?;
 
     Ok(())
 }
 
-async fn set_workspace(monitor_id: String, index: u32) -> tokio::io::Result<()> {
-    Command::new("niri")
-        .args(["msg", "action", "focus-monitor", &monitor_id])
-        .stdout(Stdio::null())
-        .output()
-        .await?;
+fn set_workspace(socket: &SharedSocket, monitor_id: String, index: u32) -> io::Result<()> {
+    let mut s = socket.lock().unwrap();
 
-    Command::new("niri")
-        .args(["msg", "action", "focus-workspace", &index.to_string()])
-        .stdout(Stdio::null())
-        .output()
-        .await?;
+    let _ = s.send(niri_ipc::Request::Action(niri_ipc::Action::FocusMonitor {
+        output: monitor_id,
+    }))?;
+
+    let _ = s.send(niri_ipc::Request::Action(
+        niri_ipc::Action::FocusWorkspace {
+            reference: niri_ipc::WorkspaceReferenceArg::Index(index as u8),
+        },
+    ))?;
 
     Ok(())
 }
 
-async fn get_monitors() -> tokio::io::Result<Vec<Monitor>> {
-    let niri = Command::new("niri")
-        .args(["msg", "workspaces"])
-        .stdout(Stdio::null())
-        .output()
-        .await?;
+fn get_monitors(socket: &SharedSocket) -> io::Result<Vec<Monitor>> {
+    let mut s = socket.lock().unwrap();
 
-    let mut monitors = vec![];
+    let reply = s.send(niri_ipc::Request::Workspaces)?;
 
-    for line in String::from_utf8_lossy(&niri.stdout).lines() {
-        if line.trim().is_empty() {
+    let Ok(niri_ipc::Response::Workspaces(workspaces)) = reply else {
+        return Err(io::Error::new(io::ErrorKind::Other, "unexpected response"));
+    };
+
+    let mut monitors: Vec<Monitor> = Vec::new();
+
+    for ws in workspaces {
+        let Some(output) = &ws.output else {
             continue;
-        }
+        };
 
-        if line.contains("Output") {
-            let monitor = if let Some(id) = line
-                .split_once("Output")
-                .and_then(|parts| parts.1.strip_suffix(':'))
-                .map(|name| name.trim().replace('"', ""))
-            {
-                Monitor {
-                    ws_count: 0,
-                    current_ws: 0,
-                    id,
-                }
-            } else {
-                Monitor {
-                    ws_count: 0,
-                    current_ws: 0,
-                    id: "?".to_string(),
-                }
-            };
+        let pos = if let Some(p) = monitors.iter().position(|m| &m.id == output) {
+            p
+        } else {
+            monitors.push(Monitor {
+                ws_count: 0,
+                current_ws: 0,
+                id: output.clone(),
+            });
+            monitors.len() - 1
+        };
 
-            monitors.push(monitor);
-            continue;
-        }
+        monitors[pos].ws_count += 1;
 
-        let current_monitor = monitors.len() - 1;
-        monitors[current_monitor].ws_count += 1;
-
-        if line.contains("*") {
-            monitors[current_monitor].current_ws = monitors[current_monitor].ws_count;
+        if ws.is_active {
+            monitors[pos].current_ws = ws.idx;
         }
     }
 

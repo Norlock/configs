@@ -33,13 +33,36 @@ require("fzf-lua").setup({
 })
 
 require("blink.cmp").setup({
-    keymap = { preset = "default" },
-    completion = { documentation = { auto_show = false } },
+    keymap = {
+        preset = "default",
+        -- Use 'accept' to confirm the selected item
+        -- Use 'fallback' so <CR> still creates a new line when the menu is closed
+        ['<Cr>'] = { 'accept', 'fallback' },
+    },
+    completion = {
+        -- 'prefix' will fuzzy match on the text before the cursor
+        -- 'full' will fuzzy match on the text before _and_ after the cursor
+        -- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
+        keyword = { range = 'full' },
+
+        -- Disable auto brackets
+        -- NOTE: some LSPs may add auto brackets themselves anyway
+        accept = { auto_brackets = { enabled = false }, },
+
+        -- Don't select by default, auto insert on selection
+        list = { selection = { preselect = true, auto_insert = false } },
+
+        -- Show documentation when selecting a completion item
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
+
+        -- Display a preview of the selected item on the current line
+        ghost_text = { enabled = false },
+    },
     sources = { default = { "lsp", "path", "snippets", "buffer" } },
     appearance = {
-      -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-      -- Adjusts spacing to ensure icons are aligned
-      nerd_font_variant = 'mono'
+        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+        -- Adjusts spacing to ensure icons are aligned
+        nerd_font_variant = 'mono'
     },
     fuzzy = { implementation = "rust" },
 })

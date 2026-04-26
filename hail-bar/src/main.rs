@@ -26,6 +26,7 @@ enum Message {
     SetWorkspace(String, u32),
     OpenOverview,
     OpenPavucontrol,
+    OpenImpala,
     SetDisplay(Display),
     NoOp,
 }
@@ -261,10 +262,30 @@ impl State {
                     Message::NoOp
                 })
             }
-            Message::OpenPavucontrol => Task::future(async {
-                let _ = open_pavucontrol().await;
-                Message::NoOp
-            }),
+            Message::OpenPavucontrol => {
+                let socket = self.niri_socket.clone();
+                Task::future(async move {
+                    let _ = spawn_app(&socket, vec!["pavucontrol".into()]);
+                    Message::NoOp
+                })
+            }
+            Message::OpenImpala => {
+                let socket = self.niri_socket.clone();
+                Task::future(async move {
+                    let _ = spawn_app(
+                        &socket,
+                        vec![
+                            "ghostty".into(),
+                            "--title=impala".into(),
+                            "--window-width=120".into(),
+                            "--window-height=34".into(),
+                            "-e".into(),
+                            "impala".into(),
+                        ],
+                    );
+                    Message::NoOp
+                })
+            }
             Message::SetDisplay(display) => {
                 self.display = display;
 
@@ -299,12 +320,9 @@ impl State {
     }
 }
 
-async fn open_pavucontrol() -> tokio::io::Result<()> {
-    Command::new("pavucontrol")
-        .stdout(Stdio::inherit())
-        .output()
-        .await?;
-
+fn spawn_app(socket: &SharedSocket, command: Vec<String>) -> io::Result<()> {
+    let mut s = socket.lock().unwrap();
+    let _ = s.send(niri_ipc::Request::Action(niri_ipc::Action::Spawn { command }))?;
     Ok(())
 }
 
@@ -486,7 +504,7 @@ fn workspaces_view(state: &State) -> Element<'_, Message> {
 
     for monitor in display.monitors.iter() {
         let button_style = |btn_ws_index: u32| -> button::Style {
-            if monitor.current_ws == btn_ws_index {
+            if monitor.current_ws as u32 == btn_ws_index {
                 button::Style {
                     background: Some(Color::from_rgb8(0, 167, 119).into()),
                     border: Border {
@@ -607,13 +625,14 @@ fn info_view(state: &State) -> Element<'_, Message> {
 
     container(
         row![
-            module(row![
+            module_button(row![
                 svg(wifi_handle)
                     .style(move |_, _| { svg::Style { color: Some(color) } })
                     .width(SVG_SIZE)
                     .height(SVG_SIZE),
                 text(&display.network.ssid)
-            ]),
+            ])
+            .on_press(Message::OpenImpala),
             module(row![
                 svg(state.brightness_handle.clone())
                     .width(SVG_SIZE)
